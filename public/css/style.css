@@ -1,0 +1,113 @@
+﻿@charset "UTF-8";
+body {margin:0;padding:0;}
+img{border:0;}
+div,td {font-size:11px;color:#232323;line-height:22px;font-family:Tahoma;}
+select{font-size:11px;font-family:Tahoma;}
+form {margin:0;padding:0;}
+ul {list-style:none;margin:0;padding:0;}
+.floatl {float:left;}
+.floatr {float:right;}
+.clear {clear:both;}
+A:link,A:visited {color:#00f; text-decoration:none;}
+A:hover {color: #f63; text-decoration:none;}
+.red {color:red;}
+.red A:link,A.red:visited {color:red;text-decoration:none;}
+A.red:hover {color:#f60;text-decoration:none;}
+A.hui:hover {color:#f60;text-decoration:none;}
+.blue {color:#0074ce;}
+.blue A:link,A.blue:visited {color:#0074ce;text-decoration:none;}
+A.blue:hover {color:#f60;text-decoration:underline;}
+/*以上是主体部分*/
+#longin_body{background:url('../../Images/longin_bg.gif');}
+#login_1 {width:636px; height:421px; margin:0 auto; margin-top:70px; background:url('../../Images/longin_top_bg.jpg');}
+#login_2 {padding:140px 0px 0px 110px; font-size:14px; font-weight:700; color:#2b5594;}
+#login_2 li {margin-bottom:15px;}
+.input_login_1 {background:url('../../Images/inputbg1.gif');color:#2b5594; border:0; height:22px; width:223px; font-size:14px; padding:5px 0px 0px 10px;}
+.input_login_3 {background:url('../../Images/inputbg2.gif');color:#2b5594; border:0; height:22px; width:129px; font-size:14px; padding:5px 0px 0px 10px;}
+.input_login_2 {background:url('../../Images/inp_login.gif'); border:0; height:28px; width:77px; margin-right:20px; margin-top:10px; margin-left:80px;font:700 12px/20px Tahoma; cursor:pointer}
+#login_3 {width:636px; height:99px; margin:0 auto;background:url('../../Images/longin_bottom_bg.gif');}
+/*Login end*/
+#headbox {height:37px;background:url('../../Images/head_left_bg.gif') bottom;overflow:hidden;text-align:right;color:#fff; font-size:12px; padding:8px 10px 0 0}
+#head_logo{position:absolute;left:20px;top:4px;z-index:3;background:url(../../Images/logo.gif); width:185px; height:28px;}
+.logout{background:url(../../Images/logout.gif); width:56px; height:19px; font:normal 11px/10px Tahoma; border:0; padding:0; color:#fff; margin-left:10px; cursor:pointer}
+/*top end*/
+.left{position: absolute; z-index:10; height:100%;}
+.left h1{background:url('../../Images/left_top_bg.gif');height:23px; color:#fff; font:normal 9px/23px Tahoma; padding:0 0 0 10px; margin:0}
+.leftbox{width:200px;}
+.leftbox div{border-bottom:1px solid #aaa;border-top:1px solid #fff; padding-left:18px; color:#000; background:#ddd; font:700 12px/19px Tahoma; display:block; cursor:pointer}
+.leftbox ul {padding:1px 0;border-bottom:1px solid #ccc; background:#fff}
+.leftbox li {margin:1px 0; font:normal 11px/20px Tahoma;height:20px}
+.leftbox li a,.leftbox li a:visited{display:block;color:#000; padding:0 0 0 18px;text-decoration:none;height:20px}
+.leftbox li A:hover,.current{display:block; color:#000; background:#CBECFF; height:20px;}
+.left h2{margin:0; padding:0 0 0 18px;border-bottom:1px solid #aaa;border-top:1px solid #fff; color:#000; background:#ddd; font:700 12px/19px Tahoma; display:block; cursor:pointer}
+.left_bg{height:100%; background:#5B5B5B}
+/*left menu end*/
+.mainbox{width:100%;float:left}
+.mainbox table{border-collapse: collapse; border:0; width:100%; background:#fff}
+.mainbox th{border:1px solid #ccc; padding:1px; background:url(../../Images/Table_bg2.gif) repeat-x center #eee; font:normal 13px/19px Tahoma}
+.mainbox td{border:1px solid #ccc; padding:0px 2px;font:normal 13px/19px Tahoma;}
+.mainbox .tdmessage td{ border: 0;padding: 3px;}
+.mainbox1{width:100%;float:left}
+.mainbox1 table{border-collapse: collapse; border:0; width:100%; background:#fff}
+.mainbox1 th{border:1px solid #ccc; padding:1px; background:url(../../Images/content_bg_2.gif) repeat-x #BEBFBF; color:#222; font:normal 11px/16px Tahoma}
+.mainbox1 td{border:1px solid #ccc; padding:0px 2px;font:normal 11px/16px Tahoma;}
+.mainbox1 .tdmessage td{ border: 0;padding: 3px;}
+.rightbox{background:url(../../Images/content_bg_2.gif) repeat-x #BEBFBF; color:#222; border-bottom:1px solid #999; border-right:1px solid #aaa; padding:2px 10px; font:100 12px/22px Tahoma;}
+.text{vertical-align:middle; margin-top:-4px;font-size:11px; padding:0;width:70px}
+.button{vertical-align:middle; margin:-4px 0 0 2px;  font:100 11px/11px Tahoma; height:20px; padding:0 8px; cursor:pointer; background:url(../../Images/button.gif); border:1px solid #5D6570;-webkit-border-radius:3px;}
+.button:hover{background:url(../../Images/button.gif) 0 -20px}
+.input_send1 {background:url(../../Images/send1.gif) no-repeat; border:0; height:21px; width:78px; margin-right:5px; cursor:pointer; vertical-align:middle}
+.input_send2 {background:url('../../Images/open_5.gif'); border:0; width:75px; height:21px; text-align:center; margin-right:5px; }
+.total{background:#ccc}
+
+/* Calendar begin */
+.calendar * { margin: 0; padding: 0; border: 0; font-family: Tahoma, serif; font-weight: normal; color: #000; }
+.calendar .invalidday a, .calendar .invalidday a:hover { color: #aaa; cursor: default; }
+.calendar .today {color:#f00}
+.calendar a { padding: 0 2px; color: #000; text-decoration: none; display:block }
+.calendar a:hover {background:#B3CEEF; }
+.calendar table { border-collapse: collapse; font-size: 90%; }
+.calendar tbody td { width:24px;line-height: 20px}
+.calendar td { padding:0px; text-align: center; }
+.calendar thead tr td { background:#C8D8ED; color:#233D6D; height:19px; border-top:1px solid #4A74BC;border-bottom:1px solid #A3BAD9 }
+.calendar thead tr.dclinks td a { font-size: 95%; font-weight: bold; color:#fff }
+.calendar thead tr.dclinks td { padding: 2px; vertical-align: middle; background:#1F3D74; border-top:1px soild #4A74BC;}
+.calendar { padding-bottom: 1px; border: 1px solid #718BB7; font-size: small; background: #fff; }
+.calendaricon { cursor: pointer; }
+.calendarlink, .calendaricon { margin: 0 3px; }
+.nextmonth,.previousmonth{ line-height:20px;}
+a.nextmonth:hover,a.previousmonth:hover{background:#294F93}
+a.currentdate:hover{ background:none}
+.calendar .weekend{color:#AB1E1E}
+.calendar .lastMonth{color: #ccc}.calendar .lastMonth:hover{color: #000}
+.calendar .nextMonth{color: #ccc}.calendar .nextMonth:hover{color: #000}
+.calendar .selectedday { background:#B3CEEF; display:block; color:#000;font-weight:bold;}
+/* Calendar end */
+/*弹出层的STYLE*/        
+ .div_loading
+ {
+     left: 50%; /*FF IE7*/
+     top: 50%; /*FF IE7*/
+     margin-left: -150px !important; /*FF IE7 该值为本身宽的一半 */
+     margin-top: -60px !important; /*FF IE7 该值为本身高的一半*/
+     margin-top: 0px;
+     position: fixed !important; /*FF IE7*/
+     position: absolute; /*IE6*/
+     _top: expression(eval(document.compatMode &&
+     document.compatMode=='CSS1Compat') ?
+     documentElement.scrollTop + (document.documentElement.clientHeight-this.offsetHeight)/2 :/*IE6*/
+     document.body.scrollTop + (document.body.clientHeight - this.clientHeight)/2); /*IE5 IE5.5*/
+ }
+ .bgenable
+ {
+     background-color: #ccc;width: 100%;height: 100%;left: 0;top: 0; /*FF IE7*/filter: alpha(opacity=50); /*IE*/
+     opacity: 0.5; /*FF*/
+     z-index: 1;
+     position: fixed !important; /*FF IE7*/
+     position: absolute; /*IE6*/
+     _top: expression(eval(document.compatMode &&
+     document.compatMode=='CSS1Compat') ?
+     documentElement.scrollTop + (document.documentElement.clientHeight-this.offsetHeight)/2 :/*IE6*/
+     document.body.scrollTop + (document.body.clientHeight - this.clientHeight)/2); /*IE5 IE5.5*/
+ }
+ /*The END*/

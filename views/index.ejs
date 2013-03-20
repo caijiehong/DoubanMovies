@@ -1,0 +1,174 @@
+﻿<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title></title>
+    <link href="/css/style.css" rel="stylesheet" type="text/css" />
+    <script type="text/javascript" src="/js/jquery-1.7.1.js"></script>
+    <script type="text/javascript" src="/js/sortable.4.0.js"></script>
+    <script type="text/javascript" src="/js/TableExt.js"></script>
+    <script type="text/javascript" src="/js/api-parser.js"></script>
+    <script type="text/javascript">        
+        function TRRender(i, item, num) {
+            var html = '';
+            html += '<tr>';
+            for (var key in item) {
+                html += '<td>' + item[key] + '</td>';
+            }
+            return html;
+        }
+
+        function GetParams() {
+            return {};
+        }
+
+        function CloseDetail() {
+            $('#div_bg').hide();
+            $('#div_contain').hide();
+        }
+
+        var Table1 = null;
+        $(document).ready(function () {
+            read();
+        });
+        var Temp = null;
+        function read() {
+            var user = $.trim($('#txt').val());
+            $.post('/douban/data', {user:user}, function (json) {
+
+                $('#divUser').html(user);
+
+                $('#tdTotalWatch').html(json.totalWatch);
+                $('#tdTotalDuration').html(json.totalDuration);
+                $('#tdAverageRate').html(json.averageRate);
+
+                $('#tbDirector,#tbCast,#tbYear,#tbRate,#tbCountry,#tbGenres,#tbWatchTime').empty();
+
+                if (json.totalWatch > 0) {
+
+                    var html = [];
+                    for (var i = 0; i < json.directors.length; i++) {
+                        var item = json.directors[i];
+                        html.push('<tr><td>' + item.director + '</td><td style="text-align:right">' + item.count + '</td></tr>');
+                    }
+                    $('#tbDirector').html(html.join(''));
+
+                    html = [];
+                    for (var i = 0; i < json.casts.length; i++) {
+                        var item = json.casts[i];
+                        html.push('<tr><td>' + item.cast + '</td><td style="text-align:right">' + item.count + '</td></tr>');
+                    }
+                    $('#tbCast').html(html.join(''));
+
+                    html = [];
+                    for (var i = 0; i < json.years.length; i++) {
+                        var item = json.years[i];
+                        html.push('<tr><td style="text-align:center">' + item.year + '</td><td style="text-align:right">' + item.count + '</td></tr>');
+                    }
+                    $('#tbYear').html(html.join(''));
+
+                    html = [];
+                    for (var i = 0; i < json.rate.length; i++) {
+                        var item = json.rate[i];
+                        html.push('<tr><td style="text-align:center">' + item.rate + '</td><td style="text-align:right">' + item.count + '</td></tr>');
+                    }
+                    $('#tbRate').html(html.join(''));
+
+                    html = [];
+                    for (var i = 0; i < json.countries.length; i++) {
+                        var item = json.countries[i];
+                        html.push('<tr><td>' + item.country + '</td><td style="text-align:right">' + item.count + '</td></tr>');
+                    }
+                    $('#tbCountry').html(html.join(''));
+
+                    html = [];
+                    for (var i = 0; i < json.genres.length; i++) {
+                        var item = json.genres[i];
+                        html.push('<tr><td>' + item.genre + '</td><td style="text-align:right">' + item.count + '</td></tr>');
+                    }
+                    $('#tbGenres').html(html.join(''));
+
+                    html = [];
+                    for (var i = 0; i < json.watchTime.length; i++) {
+                        var item = json.watchTime[i];
+                        html.push('<tr><td style="text-align:center">' + item.month + '</td><td style="text-align:right">' + item.count + '</td></tr>');
+                    }
+                    $('#tbWatchTime').html(html.join(''));
+                }
+            })
+        }        function update() {            $.post('/douban/update', { user: $('#txt').val() }, function (data) {
+
+                $('#divMsg').html(data);
+            })        }
+    </script>
+</head>
+<body>
+<div class="mainbox">
+    <div class="rightbox">
+    <input type="text" id="txt" value="<%= user %>"/>
+    <input type="button" id="Submit1" class="input_send1" value="Submit" onclick="read()">
+    <input type="button" id="Button1" class="input_send1" value="Update" onclick="update()">
+    </div>
+    <div id="divMsg"></div>
+    
+    <div style="width:300px;padding:20px">
+    <table>
+        <tr>
+            <th>总观影数</th>
+            <th>总时长</th>
+            <th>平均打分</th>
+        </tr>
+        <tr>
+            <td id="tdTotalWatch"></td>
+            <td id="tdTotalDuration"></td>
+            <td id="tdAverageRate"></td>
+        </tr>
+    </table>
+    </div>
+    <div style="padding-left:15px">
+    <table style="width:160px;float:left;margin:5px">
+        <tr>
+            <th colspan="2">年代</th>
+        </tr>
+        <tbody id="tbYear"></tbody>
+    </table>
+    <table style="width:160px;float:left;margin:5px">
+        <tr>
+            <th colspan="2">观影</th>
+        </tr>
+        <tbody id="tbWatchTime"></tbody>
+    </table>
+    <table style="width:160px;float:left;margin:5px">
+        <tr>
+            <th colspan="2">导演</th>
+        </tr>
+        <tbody id="tbDirector"></tbody>
+    </table>
+    <table style="width:160px;float:left;margin:5px">
+        <tr>
+            <th colspan="2">演员</th>
+        </tr>
+        <tbody id="tbCast"></tbody>
+    </table>
+    <table style="width:160px;float:left;margin:5px">
+        <tr>
+            <th colspan="2">国家</th>
+        </tr>
+        <tbody id="tbCountry"></tbody>
+    </table>
+    <table style="width:160px;float:left;margin:5px">
+        <tr>
+            <th colspan="2">分类</th>
+        </tr>
+        <tbody id="tbGenres"></tbody>
+    </table>
+    <table style="width:160px;float:left;margin:5px">
+        <tr>
+            <th colspan="2">打分</th>
+        </tr>
+        <tbody id="tbRate"></tbody>
+    </table>
+
+    </div>
+</div>
+</body>
+</html>
