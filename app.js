@@ -58,6 +58,7 @@ app.use(function(req, res, next){
         console.log(req.url + ' finish!');
         mongoDA.closeDB(req);
     });
+
     next();
 });
 
