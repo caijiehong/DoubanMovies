@@ -1,0 +1,49 @@
+extends layout
+
+block content
+    script(src='/js/index.js')
+    .hero-unit
+        h1 欢迎来到 我的豆瓣电影
+        - if(!session.user)
+            p
+                img#imgDouban(src='/img/login_with_douban_24.png',style='padding-top:10px;cursor:pointer')
+                input#hidDoubanKey(type='hidden', value='#{doubanKey}')
+                input#hidDomain(type='hidden', value='#{domain}')
+        input#hidUser(type='hidden', value='#{doubanUser}')
+    div(style='width:400px;padding:20px')
+        span#spnSum.span8
+    div(style='padding-left:15px')
+        table(style='width:140px;float:left;margin:5px')
+            tr
+                th(colspan='2')年代
+            tbody#tbYear
+    div(style='padding-left:15px')
+        table(style='width:140px;float:left;margin:5px')
+            tr
+                th(colspan='2')观影
+            tbody#tbWatchTime
+    div(style='padding-left:15px')
+        table(style='width:140px;float:left;margin:5px')
+            tr
+                th(colspan='2')导演
+            tbody#tbDirector
+    div(style='padding-left:15px')
+        table(style='width:140px;float:left;margin:5px')
+            tr
+                th(colspan='2')演员
+            tbody#tbCast
+    div(style='padding-left:15px')
+        table(style='width:140px;float:left;margin:5px')
+            tr
+                th(colspan='2')国家
+            tbody#tbCountry
+    div(style='padding-left:15px')
+        table(style='width:140px;float:left;margin:5px')
+            tr
+                th(colspan='2')分类
+            tbody#tbGenres
+    div(style='padding-left:15px')
+        table(style='width:140px;float:left;margin:5px')
+            tr
+                th(colspan='2')打分
+            tbody#tbRate

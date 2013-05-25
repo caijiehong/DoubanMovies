@@ -1,22 +1,21 @@
-﻿var MongoClient = require('mongodb').MongoClient,
-events = require("events");
+﻿var MongoClient = require('mongodb').MongoClient;
 
-var dbs = {};
-
-
-exports.open = function (ip, port, dbName, onConnect) {
-    if (!dbs[dbName]) {
-        //var url = 'mongodb://' + ip + ':' + port + '/doubanDB';
+exports.connectDB = function(req, onConnect){
+    if(req.mongodb){
+        onOpen(req.mongodb);
+    }else{
         var url = 'mongodb://dbuser:a123456@mongo.onmodulus.net:27017/e7Qapaze'
         MongoClient.connect(url, function (err, db) {
-            if (!err) {
-                dbs[dbName] = db;
-            }
-
+            req.mongodb = db;
             onConnect(db);
         });
-    } else {
-        onConnect(dbs[dbName]);
+    }
+}
+
+exports.closeDB = function(req){
+    if(req.mongodb){
+        req.mongodb.close();
+        req.mongodb = null;
     }
 }
 

@@ -1,52 +1,32 @@
-﻿
-var doubanAPIKey = '02b703f49616c50a08250bddc2444f1e';
+﻿var http = require('http')
+    , events = require("events")
+    , mongoDA = require('../mongo/mongoDA.js')
+    , doubanDA = require('../mongo/doubanDA.js')
+    , settings = require('../settings.js');
 
-var http = require('http'),
-    events = require("events"),
-    mongoDA = require('../mongo/mongoDA.js'),
-    doubanDA = require('../mongo/doubanDA.js');
+var doubanAPIKey = settings.doubanAPIKey;
 
-exports.get = function (req, res, action) {
-    render_index(req, res, action);
-}
-exports.post = function (req, res, action) {
+exports.data = new (function () {
+    this.post = function (req, res, action) {
+        var user = req.body.user;
+        mongoDA.connectDB(req, function (db) {
+            var users = db.collection('users');
+            var movies = db.collection('movies');
 
-    var user = req.body['user'];
-    switch (action) {
-        case 'data': {
-            render_data(req, res, user);
-            break;
-        }
-        case 'update': {
-            render_update(req, res, user);
-            break;
-        }
-        default:
-
-    }
-}
-
-var render_index = function (req, res, user) {
-    res.render('index', { user: user });
-};
-
-var render_data = function (req, res, user) {
-
-    doubanDA.collection('users', function (users) {
-        users.find({ user: user }, { _id: 0, rate: 1, date: 1, id: 1 }).toArray(function (err, item) {
-            if (err) {
-                console.log(err)
-                return;
-            }
-
-            userMovies(item, function (userMovie) {
-
+            loadUserMovies(user, users, movies, function(userMovie){
                 res.send(userMovie);
+                mongoDA.closeDB(req);
             });
-        })
-    });
+        });
+    };
+})();
 
-};
+exports.update = new (function () {
+    this.post = function (req, res) {
+        var user = req.body.user;
+        render_update(req, res, user);
+    }
+})();
 
 var render_update = function (req, res, user) {
 
@@ -54,178 +34,194 @@ var render_update = function (req, res, user) {
 
     switch (status) {
         case userUpdateList.status_NotFound:
-            {
-                res.send('Just put in queue!');
-                return;
-            }
+        {
+            res.send('Just put in queue!');
+            return;
+        }
         case userUpdateList.status_InQueue:
-            {
-                res.send('Already in queue!');
-                return;
-            }
+        {
+            res.send('Already in queue!');
+            return;
+        }
         case userUpdateList.status_Reading:
-            {
-                res.send('Already reading!');
-                return;
-            }
+        {
+            res.send('Already reading!');
+            return;
+        }
         default:
 
     }
 }
 
-function userMovies(userInfo, onUserLoaded) {
+function loadUserMovies(user, users, movies, onUserLoaded) {
 
-    var _t = {};
-    _t.totalDuration = 0;
-    _t.totalWatch = 0;
-    _t.averageRate = 0;
-    _t.rateCount = 0;
-    var watchTime = {};
+    users.find({ user: user }, { _id: 0, rate: 1, date: 1, id: 1 })
+        .toArray(function (err, userInfo) {
 
-    if (userInfo) {
-        _t.totalWatch = userInfo.length;
-        var watchList = [];
+            var _t = {};
+            _t.totalDuration = 0;
+            _t.totalWatch = 0;
+            _t.averageRate = 0;
+            _t.rateCount = 0;
+            var watchTime = {};
 
-        var rateList = {};
+            if (userInfo) {
+                _t.totalWatch = userInfo.length;
+                var watchList = [];
 
-        for (var i = 0; i < userInfo.length; i++) {
-            var item = userInfo[i];
-            if (item.rate > 0) {
-                _t.averageRate += item.rate;
-                _t.rateCount++;
-            }
+                var rateList = {};
 
-            if (rateList[item.rate]) {
-                rateList[item.rate].count++;
-            } else {
-                rateList[item.rate] = { rate: item.rate, count: 1 };
-            }
-
-
-            var month = parseInt(item.date / 100);
-            watchTime[month] = watchTime[month] ? (watchTime[month] + 1) : 1;
-            watchList.push(item.id);
-        }
-
-        var rateAr = [];
-        for (var i in rateList) {
-            rateAr.push(rateList[i]);
-        }
-
-        _t.rate = rateAr.sort(function (a, b) { a.rate - b.rate });
-
-        _t.watchTime = [];
-        for (var key in watchTime) {
-            _t.watchTime.push({ month: key, count: watchTime[key] });
-        }
-        _t.watchTime = _t.watchTime.sort(function (a, b) { return b.month - a.month; });
-
-        _t.averageRate = _t.averageRate / _t.rateCount;
-
-        doubanDA.collection('movies', function (movies) {
-
-            movies.group([], { id: { $in: watchList } }, { totalDur: 0, directors: {}, casts: {}, genres: {}, countries: {} },
-                function (obj, prev) {
-                    prev.totalDur += obj.duration || 0;
-
-                    if (obj.directors) {
-                        for (var i = 0; i < obj.directors.length; i++) {
-                            var dir = obj.directors[i].name;
-                            if (dir) {
-                                prev.directors[dir] = prev.directors[dir] ? (prev.directors[dir] + 1) : 1;
-                            }
-                        }
+                for (var i = 0; i < userInfo.length; i++) {
+                    var item = userInfo[i];
+                    if (item.rate > 0) {
+                        _t.averageRate += item.rate;
+                        _t.rateCount++;
                     }
 
-                    if (obj.casts) {
-                        for (var i = 0; i < obj.casts.length; i++) {
-                            var dir = obj.casts[i].name;
-                            if (dir) {
-                                prev.casts[dir] = prev.casts[dir] ? (prev.casts[dir] + 1) : 1;
-                            }
-                        }
+                    if (rateList[item.rate]) {
+                        rateList[item.rate].count++;
+                    } else {
+                        rateList[item.rate] = { rate: item.rate, count: 1 };
                     }
 
-                    if (obj.genres) {
-                        for (var i = 0; i < obj.genres.length; i++) {
-                            var dir = obj.genres[i];
-                            if (dir) {
-                                prev.genres[dir] = prev.genres[dir] ? (prev.genres[dir] + 1) : 1;
-                            }
-                        }
-                    }
 
-                    if (obj.countries) {
-                        for (var i = 0; i < obj.countries.length; i++) {
-                            var dir = obj.countries[i];
-                            if (dir) {
-                                prev.countries[dir] = prev.countries[dir] ? (prev.countries[dir] + 1) : 1;
-                                break;
-                            }
-                        }
-                    }
-                }, true,
-                function (err1, result1) {
+                    var month = parseInt(item.date / 100);
+                    watchTime[month] = watchTime[month] ? (watchTime[month] + 1) : 1;
+                    watchList.push(item.id);
+                }
 
-                    if (result1.length > 0) {
-                        _t.totalDuration = result1[0].totalDur;
-                        var dirAr = [];
-                        for (var dir in result1[0].directors) {
-                            dirAr.push({ director: dir, count: result1[0].directors[dir] });
-                        }
+                var rateAr = [];
+                for (var i in rateList) {
+                    rateAr.push(rateList[i]);
+                }
 
-                        dirAr = dirAr.sort(function (a, b) { return b.count - a.count });
-                        _t.directors = [];
-                        for (var i = 0; i < 30; i++) {
-                            _t.directors.push(dirAr[i]);
-                        }
-
-                        dirAr = [];
-                        for (var dir in result1[0].casts) {
-                            dirAr.push({ cast: dir, count: result1[0].casts[dir] });
-                        }
-
-                        dirAr = dirAr.sort(function (a, b) { return b.count - a.count });
-                        _t.casts = [];
-                        for (var i = 0; i < 30; i++) {
-                            _t.casts.push(dirAr[i]);
-                        }
-
-                        dirAr = [];
-                        for (var dir in result1[0].genres) {
-                            dirAr.push({ genre: dir, count: result1[0].genres[dir] });
-                        }
-
-                        dirAr = dirAr.sort(function (a, b) { return b.count - a.count });
-                        _t.genres = [];
-                        for (var i = 0; i < 20; i++) {
-                            _t.genres.push(dirAr[i]);
-                        }
-
-                        dirAr = [];
-                        for (var dir in result1[0].countries) {
-                            dirAr.push({ country: dir, count: result1[0].countries[dir] });
-                        }
-
-                        dirAr = dirAr.sort(function (a, b) { return b.count - a.count });
-                        _t.countries = [];
-                        for (var i = 0; i < 20; i++) {
-                            _t.countries.push(dirAr[i]);
-                        }
-                    }
-
-                    movies.group(['year'], { id: { $in: watchList }, year: { $ne: '' } }, { count: 0 },
-                    function (obj, prev) { prev.count++; }, true,
-                    function (err2, result2) {
-
-                        _t.years = result2.sort(function (a, b) { return b.year - a.year });
-
-                        onUserLoaded(_t);
-                    });
-
+                _t.rate = rateAr.sort(function (a, b) {
+                    a.rate - b.rate
                 });
+
+                _t.watchTime = [];
+                for (var key in watchTime) {
+                    _t.watchTime.push({ month: key, count: watchTime[key] });
+                }
+                _t.watchTime = _t.watchTime.sort(function (a, b) {
+                    return b.month - a.month;
+                });
+
+                _t.averageRate = _t.averageRate / _t.rateCount;
+
+                movies.group([], { id: { $in: watchList } }, { totalDur: 0, directors: {}, casts: {}, genres: {}, countries: {} },
+                    function (obj, prev) {
+                        prev.totalDur += obj.duration || 0;
+
+                        if (obj.directors) {
+                            for (var i = 0; i < obj.directors.length; i++) {
+                                var dir = obj.directors[i].name;
+                                if (dir) {
+                                    prev.directors[dir] = prev.directors[dir] ? (prev.directors[dir] + 1) : 1;
+                                }
+                            }
+                        }
+
+                        if (obj.casts) {
+                            for (var i = 0; i < obj.casts.length; i++) {
+                                var dir = obj.casts[i].name;
+                                if (dir) {
+                                    prev.casts[dir] = prev.casts[dir] ? (prev.casts[dir] + 1) : 1;
+                                }
+                            }
+                        }
+
+                        if (obj.genres) {
+                            for (var i = 0; i < obj.genres.length; i++) {
+                                var dir = obj.genres[i];
+                                if (dir) {
+                                    prev.genres[dir] = prev.genres[dir] ? (prev.genres[dir] + 1) : 1;
+                                }
+                            }
+                        }
+
+                        if (obj.countries) {
+                            for (var i = 0; i < obj.countries.length; i++) {
+                                var dir = obj.countries[i];
+                                if (dir) {
+                                    prev.countries[dir] = prev.countries[dir] ? (prev.countries[dir] + 1) : 1;
+                                    break;
+                                }
+                            }
+                        }
+                    }, true,
+                    function (err1, result1) {
+
+                        if (result1.length > 0) {
+                            _t.totalDuration = result1[0].totalDur;
+                            var dirAr = [];
+                            for (var dir in result1[0].directors) {
+                                dirAr.push({ director: dir, count: result1[0].directors[dir] });
+                            }
+
+                            dirAr = dirAr.sort(function (a, b) {
+                                return b.count - a.count
+                            });
+                            _t.directors = [];
+                            for (var i = 0; i < 30; i++) {
+                                _t.directors.push(dirAr[i]);
+                            }
+
+                            dirAr = [];
+                            for (var dir in result1[0].casts) {
+                                dirAr.push({ cast: dir, count: result1[0].casts[dir] });
+                            }
+
+                            dirAr = dirAr.sort(function (a, b) {
+                                return b.count - a.count
+                            });
+                            _t.casts = [];
+                            for (var i = 0; i < 30; i++) {
+                                _t.casts.push(dirAr[i]);
+                            }
+
+                            dirAr = [];
+                            for (var dir in result1[0].genres) {
+                                dirAr.push({ genre: dir, count: result1[0].genres[dir] });
+                            }
+
+                            dirAr = dirAr.sort(function (a, b) {
+                                return b.count - a.count
+                            });
+                            _t.genres = [];
+                            for (var i = 0; i < 20; i++) {
+                                _t.genres.push(dirAr[i]);
+                            }
+
+                            dirAr = [];
+                            for (var dir in result1[0].countries) {
+                                dirAr.push({ country: dir, count: result1[0].countries[dir] });
+                            }
+
+                            dirAr = dirAr.sort(function (a, b) {
+                                return b.count - a.count
+                            });
+                            _t.countries = [];
+                            for (var i = 0; i < 20; i++) {
+                                _t.countries.push(dirAr[i]);
+                            }
+                        }
+
+                        movies.group(['year'], { id: { $in: watchList }, year: { $ne: '' } }, { count: 0 },
+                            function (obj, prev) {
+                                prev.count++;
+                            }, true,
+                            function (err2, result2) {
+
+                                _t.years = result2.sort(function (a, b) {
+                                    return b.year - a.year
+                                });
+
+                                onUserLoaded(_t);
+                            });
+                    });
+            }
         });
-    }
 }
 
 var userUpdateList = new (function () {
@@ -262,14 +258,14 @@ var userUpdateList = new (function () {
 
             switch (item.status) {
                 case userUpdateList.status_InQueue:
-                    {
-                        item.status = userUpdateList.status_Reading;
+                {
+                    item.status = userUpdateList.status_Reading;
 
-                        console.log('user: ' + item.user + ' begin!');
-                        var doubanUser = new DoubanUser(item.user);
-                        doubanUser.start();
-                        break;
-                    }
+                    console.log('user: ' + item.user + ' begin!');
+                    var doubanUser = new DoubanUser(item.user);
+                    doubanUser.start();
+                    break;
+                }
                 default:
 
             }
@@ -333,7 +329,7 @@ var DoubanUser = function (user) {
 
         httpHelp.read(pageUrl, function (data) {
             var ar = [];
-            for (var i = data.indexOf('<div class="date">') ; i > -1;) {
+            for (var i = data.indexOf('<div class="date">'); i > -1;) {
                 var j = data.indexOf('</div>', i);
                 var sub = data.substring(i, j);
 
@@ -373,7 +369,6 @@ var DoubanUser = function (user) {
                 }
 
 
-
                 startIndex += 30;
                 setTimeout(readList, (1000 * 1));
             } else {
@@ -391,17 +386,17 @@ var httpHelp = new (function () {
 
     this.read = function (url, callback) {
         var buf = '';
-        http.get(url, function (res) {
+        http.get(url,function (res) {
             res.setEncoding('utf8');
 
-            res.on('data', function (chunk) {
+            res.on('data',function (chunk) {
                 buf += chunk;
             }).on('end', function () {
-                callback(buf);
-            });
+                    callback(buf);
+                });
         }).on('error', function (e) {
-            console.log("Got error: " + e.message);
-        });
+                console.log("Got error: " + e.message);
+            });
     }
 
 })();
@@ -458,16 +453,22 @@ var movieHelp = new (function () {
                     var key = item['@name'];
                     var value = item['$t']
                     switch (key) {
-                        case 'movie_duration': {
+                        case 'movie_duration':
+                        {
                             var num = value.match(/\d+/);
                             if (num) {
                                 duration = parseInt(num[0]);
                             }
                             break;
                         }
-                        case 'language': languages.push(value); break;
-                        case 'pubdate': pubdate = parseInt(dateHelper.formatDate(new Date(value), 'YYYYMMdd')); break;
-                        default: break;
+                        case 'language':
+                            languages.push(value);
+                            break;
+                        case 'pubdate':
+                            pubdate = parseInt(dateHelper.formatDate(new Date(value), 'YYYYMMdd'));
+                            break;
+                        default:
+                            break;
                     }
                 }
 
