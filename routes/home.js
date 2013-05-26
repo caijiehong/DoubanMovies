@@ -5,16 +5,37 @@ var settings = require('../settings')
 exports.index = new (function () {
     this.get = function (req, res) {
         var user = session.get(req).userInfo();
+        var douban_user_id = settings.douban_user_id;
+        var douban_user_name = settings.douban_user_name;
+        if(user){
+            douban_user_id = user.douban_user_id;
+            douban_user_name = user.douban_user_name;
+        }
 
         res.render('index',
             {
                 doubanKey: settings.doubanAPIKey,
                 domain: settings.domain,
-                doubanUser: user?user.username:settings.doubanUser
+                douban_user_id: douban_user_id,
+                douban_user_name:douban_user_name
             }
         );
     }
     return this;
+})();
+
+exports.user = new (function(){
+    this.get = function(req, res, douban_user_id){
+
+        res.render('index',
+            {
+                doubanKey: settings.doubanAPIKey,
+                domain: settings.domain,
+                douban_user_id: douban_user_id,
+                douban_user_name:douban_user_id
+            }
+        );
+    }
 })();
 
 
@@ -24,7 +45,7 @@ exports.douban = {
         var path = '/service/auth2/token?'
             + '&client_id=' + settings.doubanAPIKey
             + '&client_secret=' + settings.doubanSecret
-            + '&redirect_uri=http://' + settings.domain + '/home/douban'
+            + '&redirect_uri=http://' + settings.domain + '/home/index'
             + '&grant_type=authorization_code'
             + '&code=' + code;
         httpsPost('www.douban.com', path, null, function (err, data) {

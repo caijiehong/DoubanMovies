@@ -1,49 +1,89 @@
-extends layout
+!!! transitional
+html
+    head
+        title
+        link(rel='stylesheet', href='/css/bootstrap.css')
+        style(type='text/css')
+            body {
+                padding-top: 60px;
+                padding-bottom: 40px;
+            }
 
-block content
-    script(src='/js/index.js')
-    .hero-unit
-        h1 欢迎来到 我的豆瓣电影
-        - if(!session.user)
-            p
-                img#imgDouban(src='/img/login_with_douban_24.png',style='padding-top:10px;cursor:pointer')
-                input#hidDoubanKey(type='hidden', value='#{doubanKey}')
-                input#hidDomain(type='hidden', value='#{domain}')
-        input#hidUser(type='hidden', value='#{doubanUser}')
-    div(style='width:400px;padding:20px')
-        span#spnSum.span8
-    div(style='padding-left:15px')
-        table(style='width:140px;float:left;margin:5px')
-            tr
-                th(colspan='2')年代
-            tbody#tbYear
-    div(style='padding-left:15px')
-        table(style='width:140px;float:left;margin:5px')
-            tr
-                th(colspan='2')观影
-            tbody#tbWatchTime
-    div(style='padding-left:15px')
-        table(style='width:140px;float:left;margin:5px')
-            tr
-                th(colspan='2')导演
-            tbody#tbDirector
-    div(style='padding-left:15px')
-        table(style='width:140px;float:left;margin:5px')
-            tr
-                th(colspan='2')演员
-            tbody#tbCast
-    div(style='padding-left:15px')
-        table(style='width:140px;float:left;margin:5px')
-            tr
-                th(colspan='2')国家
-            tbody#tbCountry
-    div(style='padding-left:15px')
-        table(style='width:140px;float:left;margin:5px')
-            tr
-                th(colspan='2')分类
-            tbody#tbGenres
-    div(style='padding-left:15px')
-        table(style='width:140px;float:left;margin:5px')
-            tr
-                th(colspan='2')打分
-            tbody#tbRate
+            .listTb {
+                width: 140px;
+                float: left;
+                margin: 5px;
+                border: solid 1px;
+            }
+        link(href='/css/bootstrap-responsive.css', rel='stylesheet')
+        script(src='/js/jquery-2.0.0.js')
+        script(src='/js/bootstrap.js')
+        script(src='/js/index.js')
+    body
+        .navbar.navbar-fixed-top
+            .navbar-inner
+                .container
+                    a.btn.btn-navbar(data-toggle='collapse', data-target='.nav-collapse')
+                        span.icon-bar
+                        span.icon-bar
+                        span.icon-bar
+                    a.brand(href='/') 我的豆瓣电影
+                    .nav-collapse
+                        ul.nav
+                            if session.user
+                                li.active
+                                    a(href='/home/login')= session.user.douban_user_name
+        #container.container
+            #msgSuc.alert.alert-success(style='display:none')= typeof(success) != 'undefined'?success:''
+            #msgErr.alert.alert-error(style='display:none')= typeof(error) != 'undefined'?error:''
+            .hero-unit
+                h1 欢迎来到 我的豆瓣电影
+            div
+                span(style='padding-left:30px')
+                    - if(!session.user)
+                        img#imgDouban(src='/img/login_with_douban_24.png',style='cursor:pointer;vertical-align:middle; height: 24px;')
+                        | &nbsp&nbsp或者
+                    | 输入豆瓣ID
+                    input#txtUser.input-large(type='text',value='staybird',style='width:100px')
+                    button#btnUser.btn.btn-primary(type='submit') 看看其他人
+            div(style='width:400px;padding:20px')
+                span#spnSum.span8
+            div(style='padding-left:15px')
+                table.listTb
+                    tr
+                        th(colspan='2')年代
+                    tbody#tbYear
+            div(style='padding-left:15px')
+                table.listTb
+                    tr
+                        th(colspan='2')观影
+                    tbody#tbWatchTime
+            div(style='padding-left:15px')
+                table.listTb
+                    tr
+                        th(colspan='2')导演
+                    tbody#tbDirector
+            div(style='padding-left:15px')
+                table.listTb
+                    tr
+                        th(colspan='2')演员
+                    tbody#tbCast
+            div(style='padding-left:15px')
+                table.listTb
+                    tr
+                        th(colspan='2')国家
+                    tbody#tbCountry
+            div(style='padding-left:15px')
+                table.listTb
+                    tr
+                        th(colspan='2')分类
+                    tbody#tbGenres
+            div(style='padding-left:15px')
+                table.listTb
+                    tr
+                        th(colspan='2')打分
+                    tbody#tbRate
+        input#douban_user_name(type='hidden', value='#{douban_user_name}')
+        input#douban_user_id(type='hidden', value='#{douban_user_id}')
+        input#hidDoubanKey(type='hidden', value='#{doubanKey}')
+        input#hidDomain(type='hidden', value='#{domain}')

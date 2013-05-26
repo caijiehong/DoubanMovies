@@ -1,10 +1,11 @@
-﻿var MongoClient = require('mongodb').MongoClient;
+﻿var MongoClient = require('mongodb').MongoClient
+    ,settings = require('../settings');
 
 exports.connectDB = function(req, onConnect){
     if(req.mongodb){
         onOpen(req.mongodb);
     }else{
-        var url = 'mongodb://dbuser:a123456@mongo.onmodulus.net:27017/e7Qapaze'
+        var url = settings.dbUrl;
         MongoClient.connect(url, function (err, db) {
             req.mongodb = db;
             onConnect(db);

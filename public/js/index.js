@@ -26,7 +26,14 @@ function read(user) {
 
         var avR = Math.round(json.averageRate * 1000) / 1000;
 
-        var sum = user + ' 总共看了 ' + json.totalWatch + '部电影，总时长 ' + json.totalDuration + ' 分钟，平均打分 ' + avR;
+        var sum = $('#douban_user_name').val()
+            + ' 总共看了 '
+            + json.totalWatch
+            + ' 部电影，总时长 '
+            + json.totalDuration
+            + ' 分钟，平均打分 '
+            + avR;
+
         $('#spnSum').html(sum);
 
         $('#tbDirector,#tbCast,#tbYear,#tbRate,#tbCountry,#tbGenres,#tbWatchTime').empty();
@@ -93,5 +100,20 @@ function update() {
 }
 
 $(document).ready(function () {
-    read('staybird');
+    $('#imgDouban').click(function(){
+        var url = 'https://www.douban.com/service/auth2/auth?'
+            +'client_id='+$('#hidDoubanKey').val()
+            +'&redirect_uri=http://'+$('#hidDomain').val()+'/home/index'
+            +'&response_type=code&scope=shuo_basic_r,shuo_basic_w,douban_basic_common';
+        window.open(url, '_blank');
+    });
+    $('#btnUser').click(function(){
+        var user = $.trim($('#txtUser').val());
+        if(user){
+        window.location.href = '/home/user/' + user;
+        }else{
+            $('#msgErr').html('请输入一个豆瓣ID');
+        }
+    })
+    read($('#douban_user_id').val());
 });

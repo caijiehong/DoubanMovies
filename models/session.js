@@ -9,10 +9,10 @@ exports.get = function (req) {
         cst.prototype.userInfo = function () {
             return this.user;
         };
-        cst.prototype.initUser = function (username, userId) {
+        cst.prototype.initUser = function (douban_user_id, douban_user_name) {
             this.user = {
-                username: username,
-                userId: userId
+                douban_user_id: douban_user_id,
+                douban_user_name: douban_user_name
             };
         };
         cst.prototype.clearUser = function () {
