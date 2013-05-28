@@ -20,7 +20,7 @@ var Table1 = null;
 var Temp = null;
 
 function read(user) {
-    $.post('/douban/data', {user: user}, function (json) {
+    $.post('/home/user/' + user, function (json) {
 
         $('#divUser').html(user);
 
@@ -114,6 +114,12 @@ $(document).ready(function () {
         }else{
             $('#msgErr').html('请输入一个豆瓣ID');
         }
-    })
-    read($('#douban_user_id').val());
+    });
+
+    var user = $('#douban_user_id').val();
+    $('#btnUpdate').click(function(){
+        $.post('/home/update/' + user);
+    });
+    $('#txtUser').val(user);
+    read(user);
 });

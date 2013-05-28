@@ -1,5 +1,6 @@
 var settings = require('../settings')
     , https = require('https')
+    , doubanUser = require('../models/doubanUser')
     , session = require('../models/session');
 
 exports.index = new (function () {
@@ -20,7 +21,8 @@ exports.index = new (function () {
                 douban_user_name:douban_user_name
             }
         );
-    }
+    };
+
     return this;
 })();
 
@@ -35,9 +37,21 @@ exports.user = new (function(){
                 douban_user_name:douban_user_id
             }
         );
-    }
+    };
+
+    this.post = function(req, res, douban_user_id){
+        doubanUser.data(req, douban_user_id, function(userData){
+            res.send(userData);
+        });
+    };
 })();
 
+exports.update = new (function(){
+   this.post = function(req, res, douban_user_id){
+       var status = doubanUser.update(douban_user_id, false);
+       res.send(status);
+   };
+});
 
 exports.douban = {
     get: function (req, res) {

@@ -1,8 +1,9 @@
 var express = require('express')
     , http = require('http')
     , path = require('path')
-    , session = require('./models/session')
-    , mongoDA = require('./mongo/mongoDA');
+    , doubanUser = require('./models/doubanUser')
+    , doubanMovie = require('./models/doubanMovie')
+    , session = require('./models/session');
 
 var controllers = {};
 
@@ -27,7 +28,6 @@ app.configure('development', function () {
     app.locals.pretty = true;
 });
 
-
 function urlRouter(req, res, controller, action, id, ispost) {
     res.locals.session = session.get(req);
 
@@ -49,18 +49,9 @@ function urlRouter(req, res, controller, action, id, ispost) {
     } catch (err) {
         console.error(err.stack)
         res.status(404);
-        res.render('layout', {error: err.stack});
+        res.send('layout', {error: err.stack});
     }
 }
-
-app.use(function(req, res, next){
-    res.on('finish', function(){
-        console.log(req.url + ' finish!');
-        mongoDA.closeDB(req);
-    });
-
-    next();
-});
 
 app.get('/', function (req, res) {
     urlRouter(req, res, 'home', 'index');
@@ -74,11 +65,12 @@ app.post('/:controller/:action?/:id?', function (req, res) {
     urlRouter(req, res, req.params.controller, req.params.action, req.params.id, true);
 });
 
-
 exports.listen = listen = function (port) {
     app.listen(port);
     console.log('http://127.0.0.1:' + app.get('port'))
 }
 if (!module.parent) {
-    listen(3000);
+    listen(process.env.PORT);
+    doubanMovie.init();
+    doubanUser.init();
 }

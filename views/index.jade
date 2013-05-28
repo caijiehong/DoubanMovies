@@ -44,44 +44,45 @@ html
                         img#imgDouban(src='/img/login_with_douban_24.png',style='cursor:pointer;vertical-align:middle; height: 24px;')
                         | &nbsp&nbsp或者
                     | 输入豆瓣ID
-                    input#txtUser.input-large(type='text',value='staybird',style='width:100px')
+                    input#txtUser.input-large(type='text',style='width:100px')
                     button#btnUser.btn.btn-primary(type='submit') 看看其他人
-            div(style='width:400px;padding:20px')
-                span#spnSum.span8
+            div(style='padding:20px')
+                button#btnUpdate.btn.btn-primary 刷新数据
+                span#spnSum(style='width:600px;padding-left:10px')
             div(style='padding-left:15px')
                 table.listTb
                     tr
-                        th(colspan='2')年代
+                        th(colspan='2') 年代
                     tbody#tbYear
             div(style='padding-left:15px')
                 table.listTb
                     tr
-                        th(colspan='2')观影
+                        th(colspan='2') 观影
                     tbody#tbWatchTime
             div(style='padding-left:15px')
                 table.listTb
                     tr
-                        th(colspan='2')导演
+                        th(colspan='2') 导演
                     tbody#tbDirector
             div(style='padding-left:15px')
                 table.listTb
                     tr
-                        th(colspan='2')演员
+                        th(colspan='2') 演员
                     tbody#tbCast
             div(style='padding-left:15px')
                 table.listTb
                     tr
-                        th(colspan='2')国家
+                        th(colspan='2') 国家
                     tbody#tbCountry
             div(style='padding-left:15px')
                 table.listTb
                     tr
-                        th(colspan='2')分类
+                        th(colspan='2') 分类
                     tbody#tbGenres
             div(style='padding-left:15px')
                 table.listTb
                     tr
-                        th(colspan='2')打分
+                        th(colspan='2') 打分
                     tbody#tbRate
         input#douban_user_name(type='hidden', value='#{douban_user_name}')
         input#douban_user_id(type='hidden', value='#{douban_user_id}')

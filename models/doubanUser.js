@@ -1,62 +1,23 @@
-﻿var http = require('http')
-    , events = require("events")
-    , mongoDA = require('../mongo/mongoDA.js')
-    , doubanDA = require('../mongo/doubanDA.js')
-    , settings = require('../settings.js');
+var httpHelp = require('../common/httpHelp')
+    , doubanMovies = require('./doubanMovie.js')
+    , events = require('events')
+    , Mongoda = require('./mongoda');
 
-var doubanAPIKey = settings.doubanAPIKey;
+var userUpdateList = {};
 
-exports.data = new (function () {
-    this.post = function (req, res, action) {
-        var user = req.body.user;
-        mongoDA.connectDB(req, function (db) {
-            var users = db.collection('users');
-            var movies = db.collection('movies');
+exports.userStatus = userStatus = {
+    status_NotFound: 0,
+    status_InQueue: 1,
+    status_Reading: 2,
+    status_Done: 3
+};
 
-            loadUserMovies(user, users, movies, function(userMovie){
-                res.send(userMovie);
-                mongoDA.closeDB(req);
-            });
-        });
-    };
-})();
+exports.data = function (req, user, onDataLoad) {
+    new Mongoda(req).open(function (err, db) {
+        var users = db.collection('users');
+        var movies = db.collection('movies');
 
-exports.update = new (function () {
-    this.post = function (req, res) {
-        var user = req.body.user;
-        render_update(req, res, user);
-    }
-})();
-
-var render_update = function (req, res, user) {
-
-    var status = userUpdateList.check(user);
-
-    switch (status) {
-        case userUpdateList.status_NotFound:
-        {
-            res.send('Just put in queue!');
-            return;
-        }
-        case userUpdateList.status_InQueue:
-        {
-            res.send('Already in queue!');
-            return;
-        }
-        case userUpdateList.status_Reading:
-        {
-            res.send('Already reading!');
-            return;
-        }
-        default:
-
-    }
-}
-
-function loadUserMovies(user, users, movies, onUserLoaded) {
-
-    users.find({ user: user }, { _id: 0, rate: 1, date: 1, id: 1 })
-        .toArray(function (err, userInfo) {
+        users.find({ user: user }, { _id: 0, rate: 1, date: 1, id: 1 }).toArray(function (err, userInfo) {
 
             var _t = {};
             _t.totalDuration = 0;
@@ -108,6 +69,7 @@ function loadUserMovies(user, users, movies, onUserLoaded) {
                 });
 
                 _t.averageRate = _t.averageRate / _t.rateCount;
+
 
                 movies.group([], { id: { $in: watchList } }, { totalDur: 0, directors: {}, casts: {}, genres: {}, countries: {} },
                     function (obj, prev) {
@@ -213,91 +175,75 @@ function loadUserMovies(user, users, movies, onUserLoaded) {
                             }, true,
                             function (err2, result2) {
 
-                                _t.years = result2.sort(function (a, b) {
-                                    return b.year - a.year
-                                });
+                                if (result2) {
+                                    _t.years = result2.sort(function (a, b) {
+                                        return b.year - a.year
+                                    });
+                                }
 
-                                onUserLoaded(_t);
+                                onDataLoad(_t);
                             });
+
                     });
             }
-        });
+        })
+    });
+};
+
+exports.update = function (douban_user_id) {
+    if (userUpdateList[douban_user_id]) {
+        return userUpdateList[douban_user_id].status;
+    }
+
+    userUpdateList[douban_user_id] = { user: douban_user_id, status: userStatus.status_InQueue};
+
+    return userStatus.status_NotFound;
 }
 
-var userUpdateList = new (function () {
-    var userList = [];
+exports.init = function(){
+    readLoopUser();
+}
 
-    this.status_NotFound = 0;
-    this.status_InQueue = 1;
-    this.status_Reading = 2;
-    this.status_Done = 3;
-
-    this.check = function (user) {
-        for (var i = 0; i < userList.length; i++) {
-            var item = userList[i];
-            if (item.user == user) {
-                return item.status;
-            }
-        }
-        userList.push({ user: user, status: this.status_InQueue });
-
-
-        return this.status_NotFound;
+function readLoopUser() {
+    var douban_user_id;
+    for (var i in userUpdateList) {
+        douban_user_id = i;
+        break;
     }
 
-    this.readIsDone = function (user) {
-        if (userList.length > 0 && userList[0].status == this.status_Reading) {
-            userList.shift();
-        }
+    if (douban_user_id) {
+        new DoubanUser(douban_user_id).on('update', function () {
+            delete userUpdateList[douban_user_id];
+            setTimeout(readLoopUser, 100);
+        });
+    } else {
+        setTimeout(readLoopUser, 500);
     }
-
-    function readLoop() {
-
-        if (userList.length > 0) {
-            var item = userList[0];
-
-            switch (item.status) {
-                case userUpdateList.status_InQueue:
-                {
-                    item.status = userUpdateList.status_Reading;
-
-                    console.log('user: ' + item.user + ' begin!');
-                    var doubanUser = new DoubanUser(item.user);
-                    doubanUser.start();
-                    break;
-                }
-                default:
-
-            }
-        }
-
-
-        setTimeout(readLoop, 500);
-    }
-
-    readLoop();
-})();
-
-//创建一个EventEmitter的实例
-var tweets_emitter = new events.EventEmitter();
-
+}
 
 var DoubanUser = function (user) {
     var _t = this;
     var startIndex = 0;
-    var readCount = 0;
-    this.deepRead = false;
 
-    var needSpider = false;
+    var eve = new events.EventEmitter();
+
+    this.on = function (event, listener) {
+        eve.on(event, listener);
+        return this;
+    };
+
     var watchList = [];
     var watched = {};
     var readUser = user;
+    var totalWatched = 0;
 
-    this.start = function () {
-        doubanDA.collection('users', function (users) {
-            users.find({ user: readUser }, { _id: 0, rate: 1, date: 1, id: 1, user: 1 }).toArray(function (err, item) {
+    new Mongoda().open(function (err, db) {
+        var users = db.collection('users');
+        users.find({ user: readUser }, { _id: 0, rate: 1, date: 1, id: 1, user: 1 })
+            .toArray(function (err, item) {
+                db.close();
+
                 if (!err && item) {
-                    console.log('user:' + readUser + ' has:' + item.length)
                     watchList = item;
                     for (var i = 0; i < item.length; i++) {
                         watched[item[i].id.toString()] = true;
@@ -305,19 +251,20 @@ var DoubanUser = function (user) {
                 }
                 readList(0);
             });
-        });
-    }
+    });
 
     var updateDB = function () {
-        doubanDA.collection('users', function (users) {
+        new Mongoda().open(function (err, db) {
+            var users = db.collection('users');
+
             users.remove({ user: readUser }, { w: 1 }, function () {
                 users.insert(watchList, { w: 1 }, function () {
-                    console.log('user:' + user + ' updated:' + watchList.length);
+                    db.close();
                 });
             });
         });
 
-        userUpdateList.readIsDone(readUser);
+        eve.emit('update');
     }
 
     var readList = function (begin) {
@@ -326,8 +273,9 @@ var DoubanUser = function (user) {
         }
         var pageUrl = 'http://movie.douban.com/people/' + user + '/collect?start=' + startIndex + '&mode=list';
 
+        httpHelp.get(pageUrl, function (data) {
+            totalWatched = Number(data.match(/看过的电影\(\d+\)/)[0].match(/\d+/)[0]);
 
-        httpHelp.read(pageUrl, function (data) {
             var ar = [];
             for (var i = data.indexOf('<div class="date">'); i > -1;) {
                 var j = data.indexOf('</div>', i);
@@ -346,7 +294,6 @@ var DoubanUser = function (user) {
             var movieUrls = data.match(/http:\/\/movie.douban.com\/subject\/\d+\//g);
 
             if (movieUrls) {
-                console.log(readUser + ' read url :' + movieUrls.length + ' total : ' + watchList.length);
 
                 var stop = false;
 
@@ -354,7 +301,7 @@ var DoubanUser = function (user) {
                     var item = movieUrls[i];
                     var id = item.match(/\d+/)[0];
 
-                    movieHelp.checkDoubanId(id);
+                    doubanMovies.check(id);
 
                     if (watched[id.toString()]) {
                         stop = true;
@@ -368,7 +315,6 @@ var DoubanUser = function (user) {
                     return;
                 }
 
-
                 startIndex += 30;
                 setTimeout(readList, (1000 * 1));
             } else {
@@ -379,109 +325,5 @@ var DoubanUser = function (user) {
     }
 
     return this;
-}
+};
 
-
-var httpHelp = new (function () {
-
-    this.read = function (url, callback) {
-        var buf = '';
-        http.get(url,function (res) {
-            res.setEncoding('utf8');
-
-            res.on('data',function (chunk) {
-                buf += chunk;
-            }).on('end', function () {
-                    callback(buf);
-                });
-        }).on('error', function (e) {
-                console.log("Got error: " + e.message);
-            });
-    }
-
-})();
-
-var movieHelp = new (function () {
-    var readList = [];
-
-    this.checkDoubanId = function (doubanId) {
-        doubanDA.collection('movies', function (movies) {
-            movies.findOne({ id: doubanId }, function (err, item) {
-                if (!err && !item) {
-                    readList.push(doubanId.toString());
-                }
-            });
-        });
-    }
-
-    function readLoop() {
-        if (readList.length > 0) {
-            var doubanId = readList.shift();
-            var url = 'http://api.douban.com/v2/movie/subject/' + doubanId + '?apikey=' + doubanAPIKey;
-            httpHelp.read(url, function (data) {
-
-                var movie = JSON.parse(data);
-                doubanDA.collection('movies', function (movies) {
-                    console.log('[title]\t' + movie.title);
-                    movies.remove({ id: doubanId }, { w: 1 }, function () {
-                        movies.insert(movie, { w: 1 }, function (err, result) {
-                            if (!err) {
-                                readDoubanInfo_Old(doubanId)
-                            }
-                        });
-                    });
-                });
-            });
-        }
-
-        setTimeout(readLoop, 5500);
-    }
-
-    function readDoubanInfo_Old(doubanId) {
-        var url = 'http://api.douban.com/movie/subject/' + doubanId + '?alt=json&apikey=' + doubanAPIKey;
-        httpHelp.read(url, function (data) {
-            try {
-                var movie = JSON.parse(data);
-
-                var attributes = movie['db:attribute'];
-                var languages = [];
-                var duration = 0;
-                var pubdate = '';
-
-                for (var i = 0; i < attributes.length; i++) {
-                    var item = attributes[i];
-                    var key = item['@name'];
-                    var value = item['$t']
-                    switch (key) {
-                        case 'movie_duration':
-                        {
-                            var num = value.match(/\d+/);
-                            if (num) {
-                                duration = parseInt(num[0]);
-                            }
-                            break;
-                        }
-                        case 'language':
-                            languages.push(value);
-                            break;
-                        case 'pubdate':
-                            pubdate = parseInt(dateHelper.formatDate(new Date(value), 'YYYYMMdd'));
-                            break;
-                        default:
-                            break;
-                    }
-                }
-
-                doubanDA.collection('movies', function (movies) {
-                    var movie = JSON.parse(data);
-                    movies.update({ id: doubanId.toString() }, { $set: { languages: languages, duration: duration, pubdate: pubdate } }, { w: 1 }, function (err, result) {
-                    });
-                });
-            } catch (er) {
-                return;
-            }
-        });
-    }
-
-    readLoop();
-})();
