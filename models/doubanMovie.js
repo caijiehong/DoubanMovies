@@ -12,11 +12,8 @@ exports.check = function (doubanId) {
         return;
     }
 
-    new Mongoda().open(function (err, db) {
-        if (err) {
-            console.err(err);
-            return;
-        }
+    new Mongoda(settings.dbUrl).open(function (err, db) {
+        if (err) return;
 
         var movies = db.collection('movies');
 
@@ -30,6 +27,43 @@ exports.check = function (doubanId) {
     });
 };
 
+exports.checkList = function (checkArr) {
+    var da;
+    da = new Mongoda(settings.dbUrl);
+    return da.open(function (err, db) {
+        var movies, res;
+        movies = db.collection('movies');
+        return res = movies.group([], {
+            id: {
+                $in: checkArr
+            }
+        }, {
+            listIn: {}
+        }, (function (obj, prev) {
+            return prev.listIn[obj.id] = true;
+        }), true, function (err1, result1) {
+            var doubanId, item, lostArray, _i, _len;
+            db.close();
+            lostArray = result1.length === 0 ? checkArr : (function () {
+                var _i, _len, _results;
+                _results = [];
+                for (_i = 0, _len = checkArr.length; _i < _len; _i++) {
+                    item = checkArr[_i];
+                    if (!result1[0].listIn[item]) {
+                        _results.push(item);
+                    }
+                }
+                return _results;
+            })();
+            for (_i = 0, _len = lostArray.length; _i < _len; _i++) {
+                doubanId = lostArray[_i];
+                movieUpdateList[doubanId] = true;
+            }
+            return true;
+        });
+    });
+};
+
 exports.updateMovie = updateMovie = function (doubanId, onUpdated) {
     console.log('[movie]: ' + doubanId + ' begin!');
 
@@ -38,18 +72,23 @@ exports.updateMovie = updateMovie = function (doubanId, onUpdated) {
 
         var movie = JSON.parse(data);
 
-        new Mongoda().open(function (err, db) {
+        new Mongoda(settings.dbUrl).open(function (err, db) {
             if (err) {
-                console.err(err);
+                console.error(err);
                 return;
+            }
+            if (!movie.id) {
+                console.error('readError', movie);
+                return
             }
 
             var movies = db.collection('movies');
 
             movies.update({id: movie.id}, movie, {safe: true, upsert: true}, function (err) {
                 readDoubanPage(doubanId, function (languages, duration, pubdate) {
+
                     db.close();
-                    movies.update({ id: doubanId }, { $set: { languages: languages, duration: duration, pubdate: pubdate } }, { w: 1 }, onUpdated);
+                    movies.update({ id: movie.id }, { $set: { languages: languages, duration: duration, pubdate: pubdate } }, { w: 1 }, onUpdated);
                     console.log('[movie]: ' + doubanId + ' end!');
                 });
             });
@@ -67,28 +106,24 @@ function readDoubanPage(doubanId, onPageRead) {
         var duration = 0;
         var languages = [];
         var pubdate = 0;
+        html = html.replace(/\n/g, '');
 
-        var match = html.match(/<span property="v:runtime" content="\d+/g);
-
-        if (match && match.length > 0) {
-            duration = parseInt(match[0].match(/\d+/)[0]);
+        var reg = /<span property="v:runtime" content="(\d+)/g;
+        var r = ''
+        while(r = reg.exec(html)){
+            duration = parseInt(r[1]);
         }
 
-        match = html.match(/<span class="pl">语言\:<\/span>.+</g);
-        if (match && match.length > 0) {
-            var temp = match[0].substring(match[0].lastIndexOf('>') + 1, match[0].length - 1);
-            var tempAr = temp.split('/');
-            for (var i = 0; i < tempAr.length; i++) {
-                languages.push(tempAr[i].trim());
-            }
+        var reg = /<label>语言<\/label>([^<]+)<\/li>/g
+        var r = ''
+        while(r = reg.exec(html)){
+            languages.push(r[1].trim());
         }
 
-        match = html.match(/<span property="v:initialReleaseDate" content="\d{4}-\d{2}-\d{2}/g);
-
-        if (match && match.length > 0) {
-            var temp = match[0].match(/\d{4}-\d{2}-\d{2}/)[0];
-
-            pubdate = parseInt(dateHelp.formatDate(new Date(temp), 'YYYYMMdd'));
+        var reg = /<span property="v:initialReleaseDate" content="(\d{4}-\d{2}-\d{2})/g;
+        var r = ''
+        while(r = reg.exec(html)){
+            pubdate = parseInt(dateHelp.formatDate(new Date(r[1]), 'YYYYMMdd'));
         }
 
         onPageRead(languages, duration, pubdate);

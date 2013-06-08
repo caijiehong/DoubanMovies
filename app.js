@@ -1,38 +1,40 @@
 var express = require('express')
-    , http = require('http')
     , path = require('path')
-    , doubanUser = require('./models/doubanUser')
-    , doubanMovie = require('./models/doubanMovie')
-    , session = require('./models/session');
-
+    , settings = require('./settings.js');
 var controllers = {};
 
 var app = express();
 
 app.configure(function () {
-    app.set('port', process.env.PORT || 3000);
     app.set('views', __dirname + '/views');
     app.set('view engine', 'jade');
     app.use(express.favicon());
     app.use(express.bodyParser());
     app.use(express.methodOverride());
-    app.use(express.cookieParser('your secret here'));
-    app.use(express.session());
+    app.use(express.cookieParser());
+
+    app.use(express.session({
+        secret: settings.cookie_secret
+    }));
+
     app.use(express.static(path.join(__dirname, 'public')));
-    app.use(express.logger('dev'));
+//    app.use(express.logger('dev'));
     app.use(app.router);
 });
 
 app.configure('development', function () {
     app.use(express.errorHandler());
-    app.locals.pretty = true;
+    //app.locals.pretty = true;
 });
 
-function urlRouter(req, res, controller, action, id, ispost) {
-    res.locals.session = session.get(req);
 
-    var controller = controller || 'home';
-    var action = action || 'index';
+function urlRouter(req, res, controller, action, id, ispost) {
+
+    res.locals.douban_user_id = res.locals.douban_user_id || settings.douban_user_id;
+    res.locals.douban_user_name = res.locals.douban_user_name || settings.douban_user_name;
+
+    controller = controller || 'home';
+    action = action || 'index';
 
     var ctr = controllers[controller]
 
@@ -41,15 +43,23 @@ function urlRouter(req, res, controller, action, id, ispost) {
             ctr = controllers[controller] = require('./routes/' + controller);
         }
 
-        if (ispost) {
-            ctr[action].post(req, res, id);
+        if (ctr[action]) {
+            if (ispost && ctr[action].post) {
+                ctr[action].post(req, res, id);
+            } else if (!ispost && ctr[action].get) {
+                ctr[action].get(req, res, id);
+            } else {
+                res.status(404);
+                res.render('error', {error: 'method not found'});
+            }
         } else {
-            ctr[action].get(req, res, id);
+            res.status(404);
+            res.render('error', {error: 'page not found'});
         }
     } catch (err) {
-        console.error(err.stack)
+        console.error(err.stack);
         res.status(404);
-        res.send('layout', {error: err.stack});
+        res.render('error', {error: err.stack});
     }
 }
 
@@ -65,12 +75,17 @@ app.post('/:controller/:action?/:id?', function (req, res) {
     urlRouter(req, res, req.params.controller, req.params.action, req.params.id, true);
 });
 
-exports.listen = listen = function (port) {
-    app.listen(port);
-    console.log('http://127.0.0.1:' + app.get('port'))
-}
+
+exports.start = start = function () {
+    var server = require('http').createServer(app);
+
+    var port = settings.serverPort;
+    server.listen(port);
+
+    require('./models/doubanMovie').init();
+    require('./models/doubanUser').init();
+};
+
 if (!module.parent) {
-    listen(process.env.PORT);
-    doubanMovie.init();
-    doubanUser.init();
+    start()
 }

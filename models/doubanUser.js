@@ -1,7 +1,8 @@
 var httpHelp = require('../common/httpHelp')
     , doubanMovies = require('./doubanMovie.js')
     , events = require('events')
-    , Mongoda = require('./mongoda');
+    , Mongoda = require('./mongoda')
+    , settings = require('../settings');
 
 var userUpdateList = {};
 
@@ -12,8 +13,10 @@ exports.userStatus = userStatus = {
     status_Done: 3
 };
 
-exports.data = function (req, user, onDataLoad) {
-    new Mongoda(req).open(function (err, db) {
+exports.data = function (user, onDataLoad) {
+    new Mongoda(settings.dbUrl).open(function (err, db) {
+        if (err) return;
+
         var users = db.collection('users');
         var movies = db.collection('movies');
 
@@ -180,7 +183,7 @@ exports.data = function (req, user, onDataLoad) {
                                         return b.year - a.year
                                     });
                                 }
-
+                                db.close();
                                 onDataLoad(_t);
                             });
 
@@ -200,7 +203,7 @@ exports.update = function (douban_user_id) {
     return userStatus.status_NotFound;
 }
 
-exports.init = function(){
+exports.init = function () {
     readLoopUser();
 }
 
@@ -213,6 +216,7 @@ function readLoopUser() {
 
     if (douban_user_id) {
         new DoubanUser(douban_user_id).on('update', function () {
+            console.log(douban_user_id +' update success!')
             delete userUpdateList[douban_user_id];
             setTimeout(readLoopUser, 100);
         });
@@ -237,7 +241,7 @@ var DoubanUser = function (user) {
     var readUser = user;
     var totalWatched = 0;
 
-    new Mongoda().open(function (err, db) {
+    new Mongoda(settings.dbUrl).open(function (err, db) {
         var users = db.collection('users');
         users.find({ user: readUser }, { _id: 0, rate: 1, date: 1, id: 1, user: 1 })
             .toArray(function (err, item) {
@@ -254,7 +258,9 @@ var DoubanUser = function (user) {
     });
 
     var updateDB = function () {
-        new Mongoda().open(function (err, db) {
+        new Mongoda(settings.dbUrl).open(function (err, db) {
+            if (err) return;
+
             var users = db.collection('users');
 
             users.remove({ user: readUser }, { w: 1 }, function () {
@@ -296,12 +302,12 @@ var DoubanUser = function (user) {
             if (movieUrls) {
 
                 var stop = false;
+                var idList = [];
 
                 for (var i = 0; i < movieUrls.length; i++) {
                     var item = movieUrls[i];
                     var id = item.match(/\d+/)[0];
-
-                    doubanMovies.check(id);
+                    idList.push(id)
 
                     if (watched[id.toString()]) {
                         stop = true;
@@ -310,6 +316,7 @@ var DoubanUser = function (user) {
                         watchList.push(ar[i]);
                     }
                 }
+                doubanMovies.checkList(idList);
                 if (stop) {
                     updateDB();
                     return;

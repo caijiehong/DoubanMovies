@@ -9,6 +9,6 @@
         "express": "*",
         "jade": "*",
         "mongodb": "*",
-        "canvas":"*"
+        "canvas": "*"
     }
 }
