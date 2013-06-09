@@ -1,9 +1,10 @@
-var Mongoda = require('./mongoda')
+var settings = require('../settings')
     , httpHelp = require('../common/httpHelp')
     , dateHelp = require('../common/dateHelp')
-    , settings = require('../settings');
+    , doubanUser = require('./doubanUser');
 
 var movieUpdateList = {};
+var mongoda = null;
 
 exports.check = function (doubanId) {
     doubanId = doubanId.toString();
@@ -12,28 +13,20 @@ exports.check = function (doubanId) {
         return;
     }
 
-    new Mongoda(settings.dbUrl).open(function (err, db) {
-        if (err) return;
-
-        var movies = db.collection('movies');
-
+    mongoda.pop().collection('movies', function (movies) {
         movies.findOne({ id: doubanId }, function (err, item) {
-            db.close();
 
             if (!err && !item) {
-                movieUpdateList[doubanId] = true;
+                movieUpdateList[doubanId] = 1;
             }
         });
     });
 };
 
-exports.checkList = function (checkArr) {
-    var da;
-    da = new Mongoda(settings.dbUrl);
-    return da.open(function (err, db) {
-        var movies, res;
-        movies = db.collection('movies');
-        return res = movies.group([], {
+exports.checkList = checkList = function (checkArr) {
+    var dba = mongoda.pop()
+    dba.collection('movies', function (movies) {
+        movies.group([], {
             id: {
                 $in: checkArr
             }
@@ -43,7 +36,7 @@ exports.checkList = function (checkArr) {
             return prev.listIn[obj.id] = true;
         }), true, function (err1, result1) {
             var doubanId, item, lostArray, _i, _len;
-            db.close();
+
             lostArray = result1.length === 0 ? checkArr : (function () {
                 var _i, _len, _results;
                 _results = [];
@@ -57,7 +50,7 @@ exports.checkList = function (checkArr) {
             })();
             for (_i = 0, _len = lostArray.length; _i < _len; _i++) {
                 doubanId = lostArray[_i];
-                movieUpdateList[doubanId] = true;
+                movieUpdateList[doubanId] = 1;
             }
             return true;
         });
@@ -65,39 +58,43 @@ exports.checkList = function (checkArr) {
 };
 
 exports.updateMovie = updateMovie = function (doubanId, onUpdated) {
-    console.log('[movie]: ' + doubanId + ' begin!');
 
     var url = 'http://api.douban.com/v2/movie/subject/' + doubanId + '?apikey=' + settings.doubanAPIKey;
     httpHelp.get(url, function (data) {
+        try {
 
-        var movie = JSON.parse(data);
+            var movie = JSON.parse(data);
 
-        new Mongoda(settings.dbUrl).open(function (err, db) {
-            if (err) {
-                console.error(err);
-                return;
-            }
-            if (!movie.id) {
-                console.error('readError', movie);
-                return
-            }
+            mongoda.pop().collection('movies', function (movies) {
+                movies.update({id: movie.id}
+                    , movie
+                    , {safe: true, upsert: true}
+                    , function (err) {
+                    readDoubanPage(doubanId, function (languages, duration, pubdate) {
 
-            var movies = db.collection('movies');
+                        movies.update({ id: movie.id }
+                            , { $set: { languages: languages, duration: duration, pubdate: pubdate } }
+                            , { w: 1 }
+                            , onUpdated);
 
-            movies.update({id: movie.id}, movie, {safe: true, upsert: true}, function (err) {
-                readDoubanPage(doubanId, function (languages, duration, pubdate) {
-
-                    db.close();
-                    movies.update({ id: movie.id }, { $set: { languages: languages, duration: duration, pubdate: pubdate } }, { w: 1 }, onUpdated);
-                    console.log('[movie]: ' + doubanId + ' end!');
+                    });
                 });
             });
-        });
+        } catch (err) {
+            console.log('doubanMovie', data);
+            onUpdated();
+        }
     });
 };
 
 exports.init = function () {
+    console.log('Init', 'doubanMovie');
+
+    mongoda = new require('./dbPool')(settings.dbUrl, 1);
+
     readLoopMovie();
+
+    setInterval(readLoopMovie, 1000 * 5);
 };
 
 function readDoubanPage(doubanId, onPageRead) {
@@ -110,19 +107,25 @@ function readDoubanPage(doubanId, onPageRead) {
 
         var reg = /<span property="v:runtime" content="(\d+)/g;
         var r = ''
-        while(r = reg.exec(html)){
+        while (r = reg.exec(html)) {
             duration = parseInt(r[1]);
         }
 
-        var reg = /<label>语言<\/label>([^<]+)<\/li>/g
+        var reg = /<span class="pl">语言:<\/span>([^<]+)/g;
         var r = ''
-        while(r = reg.exec(html)){
-            languages.push(r[1].trim());
+        while (r = reg.exec(html)) {
+            var temp = r[1].split('/');
+            for (var i = 0; i < temp.length; i++) {
+                var item = temp[i].trim();
+                if (item) {
+                    languages.push(item);
+                }
+            }
         }
 
         var reg = /<span property="v:initialReleaseDate" content="(\d{4}-\d{2}-\d{2})/g;
         var r = ''
-        while(r = reg.exec(html)){
+        while (r = reg.exec(html)) {
             pubdate = parseInt(dateHelp.formatDate(new Date(r[1]), 'YYYYMMdd'));
         }
 
@@ -133,19 +136,53 @@ function readDoubanPage(doubanId, onPageRead) {
 function readLoopMovie() {
     var doubanId;
     for (var i in movieUpdateList) {
-        doubanId = i;
-        break;
+        if (movieUpdateList[i] == 1) {
+            movieUpdateList[i] = 2;
+            doubanId = i;
+            break;
+        }
     }
 
     if (doubanId) {
-        updateMovie(doubanId, function () {
-            delete movieUpdateList[doubanId];
+        console.log('[movie]: ' + doubanId + ' begin!');
 
-            setTimeout(readLoopMovie, 5500);
-        });
-    } else {
-        setTimeout(readLoopMovie, 500);
+        try {
+            updateMovie(doubanId, function () {
+                console.log('[movie]: ' + doubanId + ' end!');
+
+                delete movieUpdateList[doubanId];
+            });
+        } catch (err) {
+            console.error('doubanMovie', err)
+        }
     }
 }
 
+exports.readFrontPage = function readFrontPage() {
 
+    console.log('doubanMovie', 'read front page');
+
+    var url = 'http://movie.douban.com';
+    httpHelp.get(url, function (html) {
+
+        var movieList = [];
+        var reg = /movie\.douban\.com\/subject\/(\d+)\//g;
+        var r = null;
+        while (r = reg.exec(html)) {
+            movieList.push(r[1]);
+        }
+
+        checkList(movieList);
+
+        var userList = {};
+
+        var reg = /movie\.douban\.com\/people\/([\w]+)\//g;
+        var r = null;
+        while (r = reg.exec(html)) {
+            userList[r[1]] = true;
+        }
+        for (var key in userList) {
+            doubanUser.update(key);
+        }
+    });
+}

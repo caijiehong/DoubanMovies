@@ -22,11 +22,13 @@ var Temp = null;
 function read(user) {
     $.post('/home/user/' + user, function (json) {
 
+        document.title = json.userName + '看过的电影';
+
         $('#divUser').html(user);
 
         var avR = Math.round(json.averageRate * 1000) / 1000;
 
-        var sum = $('#douban_user_name').val()
+        var sum = '<code><a target="_blank" href="http://movie.douban.com/people/' + $('#douban_user_id').val() + '/">' + json.userName + '</a></code>'
             + ' 总共看了 '
             + json.totalWatch
             + ' 部电影，总时长 '
@@ -64,7 +66,9 @@ function read(user) {
             html = [];
             for (var i = 0; i < json.rate.length; i++) {
                 var item = json.rate[i];
-                html.push('<tr><td style="text-align:center">' + item.rate + '</td><td style="text-align:right">' + item.count + '</td></tr>');
+                if (parseInt(item.rate) > 0) {
+                    html.push('<tr><td style="text-align:center">' + item.rate + '</td><td style="text-align:right">' + item.count + '</td></tr>');
+                }
             }
             $('#tbRate').html(html.join(''));
 
@@ -100,26 +104,30 @@ function update() {
 }
 
 $(document).ready(function () {
-    $('#imgDouban').click(function(){
+    $('#imgDouban').click(function () {
         var url = 'https://www.douban.com/service/auth2/auth?'
-            +'client_id='+$('#hidDoubanKey').val()
-            +'&redirect_uri=http://'+$('#hidDomain').val()+'/home/index'
-            +'&response_type=code&scope=shuo_basic_r,shuo_basic_w,douban_basic_common';
+            + 'client_id=' + $('#hidDoubanKey').val()
+            + '&redirect_uri=http://' + $('#hidDomain').val() + '/home/index'
+            + '&response_type=code&scope=shuo_basic_r,shuo_basic_w,douban_basic_common';
         window.open(url, '_blank');
     });
-    $('#btnUser').click(function(){
+    $('#btnUser').click(function () {
         var user = $.trim($('#txtUser').val());
-        if(user){
-        window.location.href = '/home/user/' + user;
-        }else{
+        if (user) {
+            window.location.href = '/home/user/' + user;
+        } else {
             $('#msgErr').html('请输入一个豆瓣ID');
         }
+        return false;
     });
 
     var user = $('#douban_user_id').val();
-    $('#btnUpdate').click(function(){
-        $.post('/home/update/' + user);
-    });
+
     $('#txtUser').val(user);
     read(user);
 });
+
+function updateUser(){
+    var user = $('#douban_user_id').val();
+    $.post('/home/update/' + user);
+}

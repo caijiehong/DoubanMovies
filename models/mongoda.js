@@ -12,14 +12,17 @@
     _db = null;
     _dbUrl = dbUrl;
     this.open = function(onOpen) {
-      return MongoClient.connect(_dbUrl, function(err, db) {
+      MongoClient.connect(_dbUrl, function(err, db) {
         if (err) {
           console.error('DBError', err);
         }
         _db = db;
-        onOpen(err, db);
-        return this;
+        if (onOpen) {
+          onOpen(err, _t);
+        }
+        return _t;
       });
+      return this;
     };
     this.close = function() {
       if (_db) {
@@ -27,8 +30,12 @@
       }
       return this;
     };
-    this.collection = function(collectionName) {
-      if (_db) {
+    this.collection = function(collectionName, onData) {
+      if (onData) {
+        return _db.collection(collectionName, (function(err, col) {
+          return onData(col);
+        }));
+      } else {
         return _db.collection(collectionName);
       }
     };
