@@ -3,8 +3,10 @@
 
 使用豆瓣数据统计看过的电影
 
+主要涉及mongodb和 Google chart
 
-http://doumovie.duapp.com/
+
+BAE部署地址  http://doumovie.duapp.com/
 
 
 [2013.06.14] 使用 Google chart 展示数据
