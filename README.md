@@ -5,3 +5,6 @@
 
 
 http://doumovie.duapp.com/
+
+
+[2013.06.14] 使用 Google chart 展示数据
