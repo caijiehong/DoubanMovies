@@ -3,30 +3,11 @@ html
     head
         title
         link(rel='stylesheet', href='/css/bootstrap.css')
-        style(type='text/css').
-            body {
-                padding-top: 60px;
-                padding-bottom: 40px;
-            }
-
-            .listTb {
-                width: 120px;
-                float: left;
-                margin: 5px;
-                border: solid 1px;
-            }
-            .text-overflow {
-                display:block;/*内联对象需加*/
-                width:31em;
-                word-break:keep-all;/* 不换行 */
-                white-space:nowrap;/* 不换行 */
-                overflow:hidden;/* 内容超出宽度时隐藏超出部分的内容 */
-                text-overflow:ellipsis;/* 当对象内文本溢出时显示省略标记(...) ；需与overflow:hidden;一起使用。IE, Safari (WebKit)IE, Safari (WebKit)*/
-                -o-text-overflow:ellipsis; /* 兼容Opera */
-            }
+        link(rel='stylesheet', href='/css/dou.css')
         link(href='/css/bootstrap-responsive.css', rel='stylesheet')
         script(src='/js/jquery-2.0.2.min.js')
         script(src='/js/bootstrap.js')
+        script(src='https://www.google.com/jsapi')
         script(src='/js/index.js')
     body
         .navbar.navbar-fixed-top
@@ -56,43 +37,22 @@ html
 
                         - })
                 .span10
-                    div(style='padding:20px 0')
+                    div
                         button#btnUpdate.btn.btn-primary(style='display:none') 刷新数据
                         span#spnSum(style='width:600px;padding-left:10px')
+                        a.pull-right(href='https://github.com/caijiehong/DoubanMovies') @caijiehong
+                    #divLoading.progress.progress-striped.active(style='width:300px;margin:0 auto')
+                        .bar(style='width:100%;')
                     div
-                        table.listTb
-                            tr
-                                th(colspan='2') 年代
-                            tbody#tbYear
-                    div(style='padding-left:15px')
-                        table.listTb
-                            tr
-                                th(colspan='2') 观影
-                            tbody#tbWatchTime
-                    div(style='padding-left:15px')
-                        table.listTb(style='width:140px')
-                            tr
-                                th(colspan='2') 导演
-                            tbody#tbDirector
-                    div(style='padding-left:15px')
-                        table.listTb(style='width:140px')
-                            tr
-                                th(colspan='2') 演员
-                            tbody#tbCast
-                    div(style='padding-left:15px')
-                        table.listTb
-                            tr
-                                th(colspan='2') 国家
-                            tbody#tbCountry
-                    div(style='padding-left:15px')
-                        table.listTb
-                            tr
-                                th(colspan='2') 分类
-                            tbody#tbGenres
-                    div(style='padding-left:15px')
-                        table.listTb
-                            tr
-                                th(colspan='2') 打分
-                            tbody#tbRate
+                        #chart_rate(style='width:400px;height:400px;float:left')
+                        #chart_genre(style='width:400px;height:400px;margin-left:450px')
+                    div
+                        #chart_director(style='width:400px;height:800px;float:left')
+                        #chart_cast(style='width:400px;height:800px;margin-left:450px')
+                    #chart_country
+                    #chart_year
+                    #chart_watchTime
+
+
         input#douban_user_name(type='hidden', value='#{douban_user_name}')
         input#douban_user_id(type='hidden', value='#{douban_user_id}')

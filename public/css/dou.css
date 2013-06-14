@@ -1,0 +1,31 @@
+body {
+    padding-top: 60px;
+    padding-bottom: 40px;
+}
+
+.listTb {
+    width: 120px;
+    float: left;
+    margin: 5px;
+    border: solid 1px;
+}
+.star
+{
+display: inline-block;
+zoom: 1;
+width: 75px;
+height: 14px;
+background: url("/img/bigstars.gif") no-repeat;
+margin: 1px 0 0 0;
+overflow: hidden;
+}
+.star50{background-position: 0 0;}
+.star45{background-position: 0 -14px;}
+.star40{background-position: 0 -28px;}
+.star35{background-position: 0 -56px;}
+.star30{background-position: 0 -56px;}
+.star25{background-position: 0 -70px;}
+.star20{background-position: 0 -84px;}
+.star15{background-position: 0 -98px;}
+.star10{background-position: 0 -112px;}
+.star05{background-position: 0 -126px;}
