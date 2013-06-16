@@ -1,29 +1,19 @@
 !!! transitional
 html
     head
-        title
+        title 欢迎来到我的豆瓣电影
         link(rel='stylesheet', href='/css/bootstrap.css')
-        style(type='text/css').
-            body {
-                padding-top: 60px;
-                padding-bottom: 40px;
-            }
-
-            .listTb {
-                width: 140px;
-                float: left;
-                margin: 5px;
-                border: solid 1px;
-            }
+        link(rel='stylesheet', href='/css/dou.css')
         link(href='/css/bootstrap-responsive.css', rel='stylesheet')
         script(src='/js/jquery-2.0.2.min.js')
         script(src='/js/bootstrap.js')
+        script(src='https://www.google.com/jsapi')
         script(src='/js/index.js')
     body
         .navbar.navbar-fixed-top
             .navbar-inner
                 .container
-                    a.brand(href='#') 欢迎来到我的豆瓣电影
+                    a.brand(href='/') 欢迎来到我的豆瓣电影
                     .nav-collapse.collapse.navbar-responsive-collapse.pull-right
                         form.navbar-form(action='#')
                             span 输入豆瓣ID&nbsp
@@ -31,45 +21,38 @@ html
                             | &nbsp
                             button#btnUser.btn.btn-primary 看看
         #container.container
-            #msgSuc.alert.alert-success(style='display:none')= typeof(success) != 'undefined'?success:''
-            #msgErr.alert.alert-error(style='display:none')= typeof(error) != 'undefined'?error:''
-            div(style='padding:20px')
-                button#btnUpdate.btn.btn-primary 刷新数据
-                span#spnSum(style='width:600px;padding-left:10px')
-            div(style='padding-left:15px')
-                table.listTb
-                    tr
-                        th(colspan='2') 年代
-                    tbody#tbYear
-            div(style='padding-left:15px')
-                table.listTb
-                    tr
-                        th(colspan='2') 观影
-                    tbody#tbWatchTime
-            div(style='padding-left:15px')
-                table.listTb
-                    tr
-                        th(colspan='2') 导演
-                    tbody#tbDirector
-            div(style='padding-left:15px')
-                table.listTb
-                    tr
-                        th(colspan='2') 演员
-                    tbody#tbCast
-            div(style='padding-left:15px')
-                table.listTb
-                    tr
-                        th(colspan='2') 国家
-                    tbody#tbCountry
-            div(style='padding-left:15px')
-                table.listTb
-                    tr
-                        th(colspan='2') 分类
-                    tbody#tbGenres
-            div(style='padding-left:15px')
-                table.listTb
-                    tr
-                        th(colspan='2') 打分
-                    tbody#tbRate
+            .row
+                .span2
+                    ul.nav.nav-list
+                        li.nav-header Top 25
+                        - topList.forEach(function(item){
+                        -   str = item.userName || item.userId
+                        -   if(!/\w+/.test(str)){
+                        -       str = str.substring(0,7)
+                        -   }
+                            li
+                                a(href='/home/user/#{item.userId}')
+                                            span #{str}
+                                            span.pull-right #{item.totalWatch}
+
+                        - })
+                .span10
+                    div
+                        button#btnUpdate.btn.btn-primary(style='display:none') 刷新数据
+                        span#spnSum(style='width:600px;padding-left:10px')
+                        a.pull-right(href='https://github.com/caijiehong/DoubanMovies') @caijiehong
+                    #divLoading.progress.progress-striped.active(style='width:300px;margin:0 auto')
+                        .bar(style='width:100%;')
+                    div
+                        #chart_rate(style='width:400px;height:400px;float:left')
+                        #chart_genre(style='width:400px;height:400px;margin-left:450px')
+                    div
+                        #chart_director(style='width:400px;height:800px;float:left')
+                        #chart_cast(style='width:400px;height:800px;margin-left:450px')
+                    #chart_country
+                    #chart_year
+                    #chart_watchTime
+
+
         input#douban_user_name(type='hidden', value='#{douban_user_name}')
         input#douban_user_id(type='hidden', value='#{douban_user_id}')

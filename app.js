@@ -84,6 +84,7 @@ exports.start = start = function () {
 
     require('./models/doubanMovie').init();
     require('./models/doubanUser').init();
+    require('./models/dbPool').init(settings.dbUrl, 3);
 };
 
 if (!module.parent) {
