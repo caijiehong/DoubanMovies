@@ -1,0 +1,169 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+<head><title></title>
+    <link rel="stylesheet" href="/css/bootstrap.css"/>
+    <style type="text/css">body {
+        padding-top: 60px;
+        padding-bottom: 40px;
+    }
+
+    .listTb {
+        width: 120px;
+        float: left;
+        margin: 5px;
+        border: solid 1px;
+    }</style>
+    <link href="/css/bootstrap-responsive.css" rel="stylesheet"/>
+    <script src="/js/jquery-2.0.2.min.js"></script>
+    <script src="/js/bootstrap.js"></script>
+    <script type="text/javascript" src="https://www.google.com/jsapi"></script>
+    <script type="text/javascript">
+        // Load the Visualization API and the piechart package.
+        google.load('visualization', '1.0', {'packages':['corechart']});
+
+        // Set a callback to run when the Google Visualization API is loaded.
+        google.setOnLoadCallback(drawChart);
+
+        // Callback that creates and populates a data table,
+        // instantiates the pie chart, passes in the data and
+        // draws it.
+        function drawChart() {
+
+            // Create the data table.
+            var data = new google.visualization.DataTable();
+            data.addColumn('string', 'Topping');
+            data.addColumn('number', 'Slices');
+            data.addRows([
+                ['Mushrooms', 3],
+                ['Onions', 1],
+                ['Olives', 1],
+                ['Zucchini', 1],
+                ['Pepperoni', 2]
+            ]);
+
+            // Set chart options
+            var options = {'title':'',
+                'width':400,
+                'height':300};
+
+            // Instantiate and draw our chart, passing in some options.
+            var chart = new google.visualization.PieChart(document.getElementById('chart_div'));
+            chart.draw(data, options);
+        }
+    </script>
+</head>
+<body>
+<div class="navbar navbar-fixed-top">
+    <div class="navbar-inner">
+        <div class="container"><a href="/" class="brand">欢迎来到我的豆瓣电影</a>
+
+            <div class="nav-collapse collapse navbar-responsive-collapse pull-right">
+                <form action="#" class="navbar-form"><span>输入豆瓣ID&nbsp</span><input id="txtUser" type="text"
+                                                                                    value="staybird"
+                                                                                    style="width:90px"/>&nbsp
+                    <button id="btnUser" class="btn btn-primary">看看</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<div id="container" class="container">
+    <div class="row">
+        <div class="span2">
+            <ul class="nav nav-list">
+                <li class="nav-header">Top 25</li>
+                <li><a href="/home/user/qijiuzhiyue"><span>桃桃林林</span><span class="pull-right">7576</span></a></li>
+                <li><a href="/home/user/dengyigeren"><span>等一个人</span><span class="pull-right">6230</span></a></li>
+                <li><a href="/home/user/richer725"><span>荔枝超人</span><span class="pull-right">5164</span></a></li>
+                <li><a href="/home/user/luhua"><span>芦哲峰</span><span class="pull-right">4465</span></a></li>
+                <li><a href="/home/user/MovieL"><span>木卫二</span><span class="pull-right">3509</span></a></li>
+                <li><a href="/home/user/kidcby"><span>某白</span><span class="pull-right">3409</span></a></li>
+                <li><a href="/home/user/flower21"><span>JA5ON™</span><span class="pull-right">2973</span></a></li>
+                <li><a href="/home/user/tjz230"><span>影志</span><span class="pull-right">2950</span></a></li>
+                <li><a href="/home/user/15124799"><span>Giosuè Ψ</span><span class="pull-right">2676</span></a></li>
+                <li><a href="/home/user/2080524"><span>金刚明月</span><span class="pull-right">2599</span></a></li>
+                <li><a href="/home/user/57517076"><span>炫丽之星际云天</span><span class="pull-right">2465</span></a></li>
+                <li><a href="/home/user/1895572"><span>★★☆☆☆</span><span class="pull-right">2130</span></a></li>
+                <li><a href="/home/user/conanemily"><span>米粒</span><span class="pull-right">2126</span></a></li>
+                <li><a href="/home/user/wzcjojo"><span>wzcjojo</span><span class="pull-right">2051</span></a></li>
+                <li><a href="/home/user/sunshtlaolian"><span>老脸</span><span class="pull-right">2004</span></a></li>
+                <li><a href="/home/user/2849243"><span>shininglove</span><span class="pull-right">1949</span></a></li>
+                <li><a href="/home/user/1941470"><span>闪正</span><span class="pull-right">1842</span></a></li>
+                <li><a href="/home/user/tiamopippo"><span>Griet</span><span class="pull-right">1615</span></a></li>
+                <li><a href="/home/user/3540441"><span>同志亦凡人中文</span><span class="pull-right">1396</span></a></li>
+                <li><a href="/home/user/1227406"><span>waking forest</span><span class="pull-right">1291</span></a></li>
+                <li><a href="/home/user/1470863"><span>自来水公司管道</span><span class="pull-right">1272</span></a></li>
+                <li><a href="/home/user/ccqy"><span>C.C.Q.Y.</span><span class="pull-right">1195</span></a></li>
+                <li><a href="/home/user/1645277"><span>阖昔</span><span class="pull-right">1098</span></a></li>
+                <li><a href="/home/user/staybird"><span>straybird</span><span class="pull-right">1049</span></a></li>
+                <li><a href="/home/user/1799597"><span>丁丁执剑</span><span class="pull-right">993</span></a></li>
+            </ul>
+        </div>
+        <div class="span10">
+            <div style="padding:20px 0">
+                <button id="btnUpdate" style="display:none" class="btn btn-primary">刷新数据</button>
+                <span id="spnSum" style="width:600px;padding-left:10px"><a target="_blank" href="http://movie.douban.com/people/staybird/">straybird</a> 总共看了 1047 部电影，总时长 94223 分钟，平均打分 3.301</span><a href="https://github.com/caijiehong/DoubanMovies" class="pull-right">@caijiehong</a></div>
+            <div id="chart_div"></div>
+            <div>
+                <table class="listTb">
+                    <tbody><tr>
+                        <th colspan="2">年代</th>
+                    </tr>
+                    </tbody><tbody id="tbYear"><tr><td style="text-align:center">2013</td><td style="text-align:right">12</td></tr><tr><td style="text-align:center">2012</td><td style="text-align:right">90</td></tr><tr><td style="text-align:center">2011</td><td style="text-align:right">102</td></tr><tr><td style="text-align:center">2010</td><td style="text-align:right">71</td></tr><tr><td style="text-align:center">2009</td><td style="text-align:right">71</td></tr><tr><td style="text-align:center">2008</td><td style="text-align:right">65</td></tr><tr><td style="text-align:center">2007</td><td style="text-align:right">65</td></tr><tr><td style="text-align:center">2006</td><td style="text-align:right">65</td></tr><tr><td style="text-align:center">2005</td><td style="text-align:right">36</td></tr><tr><td style="text-align:center">2004</td><td style="text-align:right">43</td></tr><tr><td style="text-align:center">2003</td><td style="text-align:right">34</td></tr><tr><td style="text-align:center">2002</td><td style="text-align:right">26</td></tr><tr><td style="text-align:center">2001</td><td style="text-align:right">32</td></tr><tr><td style="text-align:center">2000</td><td style="text-align:right">22</td></tr><tr><td style="text-align:center">1999</td><td style="text-align:right">22</td></tr><tr><td style="text-align:center">1998</td><td style="text-align:right">20</td></tr><tr><td style="text-align:center">1997</td><td style="text-align:right">26</td></tr><tr><td style="text-align:center">1996</td><td style="text-align:right">10</td></tr><tr><td style="text-align:center">1995</td><td style="text-align:right">17</td></tr><tr><td style="text-align:center">1994</td><td style="text-align:right">23</td></tr><tr><td style="text-align:center">1993</td><td style="text-align:right">20</td></tr><tr><td style="text-align:center">1992</td><td style="text-align:right">20</td></tr><tr><td style="text-align:center">1991</td><td style="text-align:right">16</td></tr><tr><td style="text-align:center">1990</td><td style="text-align:right">10</td></tr><tr><td style="text-align:center">1989</td><td style="text-align:right">17</td></tr><tr><td style="text-align:center">1988</td><td style="text-align:right">14</td></tr><tr><td style="text-align:center">1987</td><td style="text-align:right">13</td></tr><tr><td style="text-align:center">1986</td><td style="text-align:right">15</td></tr><tr><td style="text-align:center">1985</td><td style="text-align:right">8</td></tr><tr><td style="text-align:center">1984</td><td style="text-align:right">6</td></tr><tr><td style="text-align:center">1983</td><td style="text-align:right">9</td></tr><tr><td style="text-align:center">1982</td><td style="text-align:right">7</td></tr><tr><td style="text-align:center">1981</td><td style="text-align:right">7</td></tr><tr><td style="text-align:center">1980</td><td style="text-align:right">2</td></tr><tr><td style="text-align:center">1979</td><td style="text-align:right">4</td></tr><tr><td style="text-align:center">1978</td><td style="text-align:right">1</td></tr><tr><td style="text-align:center">1977</td><td style="text-align:right">1</td></tr><tr><td style="text-align:center">1975</td><td style="text-align:right">2</td></tr><tr><td style="text-align:center">1974</td><td style="text-align:right">1</td></tr><tr><td style="text-align:center">1972</td><td style="text-align:right">1</td></tr><tr><td style="text-align:center">1968</td><td style="text-align:right">1</td></tr><tr><td style="text-align:center">1967</td><td style="text-align:right">1</td></tr><tr><td style="text-align:center">1965</td><td style="text-align:right">1</td></tr><tr><td style="text-align:center">1961</td><td style="text-align:right">1</td></tr><tr><td style="text-align:center">1960</td><td style="text-align:right">1</td></tr><tr><td style="text-align:center">1959</td><td style="text-align:right">2</td></tr><tr><td style="text-align:center">1957</td><td style="text-align:right">1</td></tr><tr><td style="text-align:center">1956</td><td style="text-align:right">1</td></tr><tr><td style="text-align:center">1955</td><td style="text-align:right">1</td></tr><tr><td style="text-align:center">1952</td><td style="text-align:right">1</td></tr><tr><td style="text-align:center">1950</td><td style="text-align:right">1</td></tr></tbody>
+                </table>
+            </div>
+            <div style="padding-left:15px">
+                <table class="listTb">
+                    <tbody><tr>
+                        <th colspan="2">观影</th>
+                    </tr>
+                    </tbody><tbody id="tbWatchTime"><tr><td style="text-align:center">201306</td><td style="text-align:right">1</td></tr><tr><td style="text-align:center">201305</td><td style="text-align:right">13</td></tr><tr><td style="text-align:center">201304</td><td style="text-align:right">3</td></tr><tr><td style="text-align:center">201303</td><td style="text-align:right">20</td></tr><tr><td style="text-align:center">201302</td><td style="text-align:right">28</td></tr><tr><td style="text-align:center">201301</td><td style="text-align:right">17</td></tr><tr><td style="text-align:center">201212</td><td style="text-align:right">18</td></tr><tr><td style="text-align:center">201211</td><td style="text-align:right">16</td></tr><tr><td style="text-align:center">201210</td><td style="text-align:right">44</td></tr><tr><td style="text-align:center">201209</td><td style="text-align:right">12</td></tr><tr><td style="text-align:center">201208</td><td style="text-align:right">2</td></tr><tr><td style="text-align:center">201206</td><td style="text-align:right">6</td></tr><tr><td style="text-align:center">201205</td><td style="text-align:right">31</td></tr><tr><td style="text-align:center">201204</td><td style="text-align:right">109</td></tr><tr><td style="text-align:center">201203</td><td style="text-align:right">73</td></tr><tr><td style="text-align:center">201202</td><td style="text-align:right">26</td></tr><tr><td style="text-align:center">201201</td><td style="text-align:right">15</td></tr><tr><td style="text-align:center">201112</td><td style="text-align:right">7</td></tr><tr><td style="text-align:center">201111</td><td style="text-align:right">12</td></tr><tr><td style="text-align:center">201110</td><td style="text-align:right">7</td></tr><tr><td style="text-align:center">201109</td><td style="text-align:right">4</td></tr><tr><td style="text-align:center">201108</td><td style="text-align:right">7</td></tr><tr><td style="text-align:center">201107</td><td style="text-align:right">2</td></tr><tr><td style="text-align:center">201106</td><td style="text-align:right">5</td></tr><tr><td style="text-align:center">201105</td><td style="text-align:right">6</td></tr><tr><td style="text-align:center">201104</td><td style="text-align:right">100</td></tr><tr><td style="text-align:center">201103</td><td style="text-align:right">269</td></tr><tr><td style="text-align:center">201102</td><td style="text-align:right">10</td></tr><tr><td style="text-align:center">201010</td><td style="text-align:right">8</td></tr><tr><td style="text-align:center">201007</td><td style="text-align:right">1</td></tr><tr><td style="text-align:center">201006</td><td style="text-align:right">38</td></tr><tr><td style="text-align:center">201003</td><td style="text-align:right">44</td></tr><tr><td style="text-align:center">201002</td><td style="text-align:right">27</td></tr><tr><td style="text-align:center">200911</td><td style="text-align:right">2</td></tr><tr><td style="text-align:center">200910</td><td style="text-align:right">64</td></tr></tbody>
+                </table>
+            </div>
+            <div style="padding-left:15px">
+                <table style="width:140px" class="listTb">
+                    <tbody><tr>
+                        <th colspan="2">导演</th>
+                    </tr>
+                    </tbody><tbody id="tbDirector"><tr><td>杜琪峰</td><td style="text-align:right">17</td></tr><tr><td>徐克</td><td style="text-align:right">17</td></tr><tr><td>史蒂文·斯皮尔伯格</td><td style="text-align:right">12</td></tr><tr><td>王晶</td><td style="text-align:right">11</td></tr><tr><td>王家卫</td><td style="text-align:right">10</td></tr><tr><td>约翰·拉塞特</td><td style="text-align:right">10</td></tr><tr><td>蒂姆·波顿</td><td style="text-align:right">10</td></tr><tr><td>麦兆辉</td><td style="text-align:right">9</td></tr><tr><td>刘伟强</td><td style="text-align:right">9</td></tr><tr><td>成龙</td><td style="text-align:right">8</td></tr><tr><td>宫崎骏</td><td style="text-align:right">8</td></tr><tr><td>周星驰</td><td style="text-align:right">8</td></tr><tr><td>李安</td><td style="text-align:right">8</td></tr><tr><td>大卫·芬奇</td><td style="text-align:right">7</td></tr><tr><td>张艺谋</td><td style="text-align:right">7</td></tr><tr><td>冯小刚</td><td style="text-align:right">7</td></tr><tr><td>昆汀·塔伦蒂诺</td><td style="text-align:right">7</td></tr><tr><td>詹姆斯·卡梅隆</td><td style="text-align:right">7</td></tr><tr><td>雷德利·斯科特</td><td style="text-align:right">7</td></tr><tr><td>迈克尔·贝</td><td style="text-align:right">6</td></tr><tr><td>李力持</td><td style="text-align:right">6</td></tr><tr><td>吴宇森</td><td style="text-align:right">6</td></tr><tr><td>山本泰一郎</td><td style="text-align:right">6</td></tr><tr><td>彼得·杰克逊</td><td style="text-align:right">6</td></tr><tr><td>洪金宝</td><td style="text-align:right">6</td></tr><tr><td>克里斯托弗·诺兰</td><td style="text-align:right">6</td></tr><tr><td>儿玉兼嗣</td><td style="text-align:right">5</td></tr><tr><td>朗·霍华德</td><td style="text-align:right">5</td></tr><tr><td>罗伯特·泽米吉斯</td><td style="text-align:right">5</td></tr><tr><td>叶伟信</td><td style="text-align:right">5</td></tr></tbody>
+                </table>
+            </div>
+            <div style="padding-left:15px">
+                <table style="width:140px" class="listTb">
+                    <tbody><tr>
+                        <th colspan="2">演员</th>
+                    </tr>
+                    </tbody><tbody id="tbCast"><tr><td>尼古拉斯·凯奇</td><td style="text-align:right">23</td></tr><tr><td>周星驰</td><td style="text-align:right">23</td></tr><tr><td>刘德华</td><td style="text-align:right">21</td></tr><tr><td>梁朝伟</td><td style="text-align:right">20</td></tr><tr><td>成龙</td><td style="text-align:right">20</td></tr><tr><td>布拉德·皮特</td><td style="text-align:right">18</td></tr><tr><td>李连杰</td><td style="text-align:right">18</td></tr><tr><td>周润发</td><td style="text-align:right">17</td></tr><tr><td>马特·达蒙</td><td style="text-align:right">15</td></tr><tr><td>张国荣</td><td style="text-align:right">15</td></tr><tr><td>甄子丹</td><td style="text-align:right">15</td></tr><tr><td>张曼玉</td><td style="text-align:right">15</td></tr><tr><td>约翰尼·德普</td><td style="text-align:right">14</td></tr><tr><td>洪金宝</td><td style="text-align:right">14</td></tr><tr><td>曾志伟</td><td style="text-align:right">13</td></tr><tr><td>吴孟达</td><td style="text-align:right">13</td></tr><tr><td>高山南</td><td style="text-align:right">13</td></tr><tr><td>古天乐</td><td style="text-align:right">13</td></tr><tr><td>汤姆·汉克斯</td><td style="text-align:right">12</td></tr><tr><td>任达华</td><td style="text-align:right">12</td></tr><tr><td>山崎和佳奈</td><td style="text-align:right">12</td></tr><tr><td>黄秋生</td><td style="text-align:right">11</td></tr><tr><td>海伦娜·邦汉·卡特</td><td style="text-align:right">11</td></tr><tr><td>布鲁斯·威利斯</td><td style="text-align:right">11</td></tr><tr><td>林青霞</td><td style="text-align:right">11</td></tr><tr><td>梁家辉</td><td style="text-align:right">11</td></tr><tr><td>乔治·克鲁尼</td><td style="text-align:right">10</td></tr><tr><td>刘青云</td><td style="text-align:right">10</td></tr><tr><td>金城武</td><td style="text-align:right">10</td></tr><tr><td>吴君如</td><td style="text-align:right">10</td></tr></tbody>
+                </table>
+            </div>
+            <div style="padding-left:15px">
+                <table class="listTb">
+                    <tbody><tr>
+                        <th colspan="2">国家</th>
+                    </tr>
+                    </tbody><tbody id="tbCountry"><tr><td>美国</td><td style="text-align:right">488</td></tr><tr><td>香港</td><td style="text-align:right">168</td></tr><tr><td>中国大陆</td><td style="text-align:right">125</td></tr><tr><td>日本</td><td style="text-align:right">97</td></tr><tr><td>英国</td><td style="text-align:right">46</td></tr><tr><td>法国</td><td style="text-align:right">30</td></tr><tr><td>中国</td><td style="text-align:right">23</td></tr><tr><td>台湾</td><td style="text-align:right">10</td></tr><tr><td>韩国</td><td style="text-align:right">9</td></tr><tr><td>德国</td><td style="text-align:right">8</td></tr><tr><td>西班牙</td><td style="text-align:right">5</td></tr><tr><td>加拿大</td><td style="text-align:right">4</td></tr><tr><td>澳大利亚</td><td style="text-align:right">4</td></tr><tr><td>新西兰</td><td style="text-align:right">3</td></tr><tr><td>意大利</td><td style="text-align:right">3</td></tr><tr><td>爱尔兰</td><td style="text-align:right">2</td></tr><tr><td>伊朗</td><td style="text-align:right">2</td></tr><tr><td>捷克</td><td style="text-align:right">2</td></tr><tr><td>印度</td><td style="text-align:right">2</td></tr><tr><td>俄罗斯</td><td style="text-align:right">2</td></tr></tbody>
+                </table>
+            </div>
+            <div style="padding-left:15px">
+                <table class="listTb">
+                    <tbody><tr>
+                        <th colspan="2">分类</th>
+                    </tr>
+                    </tbody><tbody id="tbGenres"><tr><td>剧情</td><td style="text-align:right">461</td></tr><tr><td>动作</td><td style="text-align:right">387</td></tr><tr><td>喜剧</td><td style="text-align:right">293</td></tr><tr><td>动画</td><td style="text-align:right">236</td></tr><tr><td>冒险</td><td style="text-align:right">187</td></tr><tr><td>爱情</td><td style="text-align:right">157</td></tr><tr><td>惊悚</td><td style="text-align:right">142</td></tr><tr><td>犯罪</td><td style="text-align:right">136</td></tr><tr><td>奇幻</td><td style="text-align:right">132</td></tr><tr><td>科幻</td><td style="text-align:right">108</td></tr><tr><td>家庭</td><td style="text-align:right">86</td></tr><tr><td>悬疑</td><td style="text-align:right">75</td></tr><tr><td>短片</td><td style="text-align:right">68</td></tr><tr><td>历史</td><td style="text-align:right">41</td></tr><tr><td>战争</td><td style="text-align:right">25</td></tr><tr><td>传记</td><td style="text-align:right">24</td></tr><tr><td>恐怖</td><td style="text-align:right">15</td></tr><tr><td>儿童</td><td style="text-align:right">13</td></tr><tr><td>纪录片</td><td style="text-align:right">11</td></tr><tr><td>音乐</td><td style="text-align:right">11</td></tr></tbody>
+                </table>
+            </div>
+            <div style="padding-left:15px">
+                <table class="listTb">
+                    <tbody><tr>
+                        <th colspan="2">打分</th>
+                    </tr>
+                    </tbody><tbody id="tbRate"><tr><td style="text-align:center">1</td><td style="text-align:right">46</td></tr><tr><td style="text-align:center">2</td><td style="text-align:right">148</td></tr><tr><td style="text-align:center">3</td><td style="text-align:right">414</td></tr><tr><td style="text-align:center">4</td><td style="text-align:right">319</td></tr><tr><td style="text-align:center">5</td><td style="text-align:right">118</td></tr></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+<input id="douban_user_name" type="hidden" value="straybird"/><input id="douban_user_id" type="hidden"
+                                                                     value="staybird"/></body>
+</html>
