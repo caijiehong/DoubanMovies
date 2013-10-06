@@ -1,0 +1,56 @@
+!!! transitional
+html
+    head
+        title 那些年我们看过的豆瓣·电影
+        meta(charset='utf-8')
+        meta(name='viewport', content='width=device-width, initial-scale=1')
+        meta(http-equiv="Access-Control-Allow-Origin", content="*")
+        link(rel='stylesheet', href='/css/dou.css')
+        link(rel='stylesheet', href='/css/jquery.mobile.structure-1.3.2.min.css')
+        link(rel='stylesheet', href='/css/my.min.css')
+        script(src='/js/wap/require/require.js', data-main="/js/wap/main")
+    body
+        #home(data-role='page')
+            #headerHome(data-role='header', data-position="inline", data-position="fixed")
+                a(href='#leftPanelHome', data-icon='bars', data-iconpos='notext')
+                h1#h1Home
+                a.ui-btn-right(href='#rightPanelHome', data-icon='bars', data-iconpos='notext')
+            #contentHome(data-role='content')
+                #divBg.bg
+            //#footerHome(data-role='footer')
+            #rightPanelHome(data-role='panel',data-theme="a", data-display="overlay", data-position="right")
+                ul(data-role='listview')
+                    li(data-icon='delete')
+                        a(data-rel='close') 类别
+                    li
+                        a(href='#home/rate') 打分
+                    li
+                        a(href='#home/directors') 导演
+                    li
+                        a(href='#home/casts') 演员
+                    li
+                        a(href='#home/years') 上映
+                    li
+                        a(href='#home/watchTime') 观影
+                    li
+                        a(href='#home/countries') 国家
+                    li
+                        a(href='#home/genres') 类型
+            #leftPanelHome(data-role='panel', data-display="overlay", data-position="left")
+                ul(data-role='listview')
+                    li(data-icon='delete')
+                        a(data-rel='close')
+                    - topList.forEach(function(item){
+                    li
+                        a(href='/wap/index/#{item.userId}') #{item.userName}
+                    - })
+        #list(data-role='page')
+            #headerList(data-role='header', data-position="inline", data-position="fixed")
+                a(href="#", data-role="button",data-icon="home",data-iconpos="notext",data-inline="true")
+                h1#h1List
+                a.ui-btn-right(href='#rightPanelList', data-role="button",data-inline="true", data-icon='bars', data-iconpos='notext')
+            #contentList(data-role='content')
+                ul#ulMovieList(data-role='listview',data-inset="true")
+                button#btnLoadMore 加载更多
+            #rightPanelList(data-role='panel',data-theme="a", data-display="overlay", data-position="right")
+                ul#ulList(data-role='listview')

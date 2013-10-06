@@ -1,0 +1,54 @@
+!!! transitional
+html
+    head
+        title 那些年我们看过的豆瓣·图书
+        link(rel='stylesheet', href='/css/bootstrap.css')
+        link(rel='stylesheet', href='/css/dou.css')
+        link(href='/css/bootstrap-responsive.css', rel='stylesheet')
+        script(src='/lib/jquery-2.0.3.min.js')
+        script(src='/js/bootstrap.js')
+        script(src='https://www.google.com/jsapi')
+        script(src='/js/book.js')
+    body
+        .navbar.navbar-fixed-top
+            .navbar-inner
+                .container
+                    a.brand(href='/book') 那些年我们看过的豆瓣·图书
+                    .nav-collapse.collapse.navbar-responsive-collapse.pull-right
+                        form.navbar-form(action='#')
+                            span 输入豆瓣ID&nbsp
+                            input#txtUser(type='text', value='staybird', style='width:90px')
+                            | &nbsp
+                            button#btnUser.btn.btn-primary 看看
+        #container.container
+            .row
+                .span2
+                    ul.nav.nav-list
+                        li.nav-header Top 25
+                        - topList.forEach(function(item){
+                        -   str = item.name || item.id
+                        -   if(!/\w+/.test(str)){
+                        -       str = str.substring(0,7)
+                        -   }
+                            li
+                                a(href='/book/user/#{item.id}')
+                                    span #{str}
+                                    span.pull-right #{item.total}
+
+                        - })
+                .span10
+                    div
+                        span#spnSum(style='width:600px;padding-left:10px')
+                        a.pull-right(href='https://github.com/caijiehong/DoubanMovies') @caijiehong
+                    #divLoading.progress.progress-striped.active(style='width:300px;margin:0 auto')
+                        .bar(style='width:100%;')
+                    div
+                        #chart_rate(style='width:400px;height:400px;float:left')
+                        #chart_author(style='width:400px;height:400px;margin-left:450px')
+                    #chart_country
+                    #chart_year
+                    #chart_watchTime
+
+
+        input#douban_user_name(type='hidden', value='#{douban_user_name}')
+        input#douban_user_id(type='hidden', value='#{douban_user_id}')

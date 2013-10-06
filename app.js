@@ -1,6 +1,7 @@
 var express = require('express')
     , path = require('path')
-    , settings = require('./settings.js');
+    , settings = require('./settings.js')
+    , Q = require('./lib/q.js');
 var controllers = {};
 
 var app = express();
@@ -14,6 +15,7 @@ app.configure(function () {
     app.use(express.cookieParser());
 
     app.use(express.session({
+
         secret: settings.cookie_secret
     }));
 
@@ -24,24 +26,30 @@ app.configure(function () {
 
 app.configure('development', function () {
     app.use(express.errorHandler());
-    //app.locals.pretty = true;
+    app.locals.pretty = true;
 });
 
 
 function urlRouter(req, res, controller, action, id, ispost) {
 
-    res.locals.douban_user_id = res.locals.douban_user_id || settings.douban_user_id;
-    res.locals.douban_user_name = res.locals.douban_user_name || settings.douban_user_name;
+    if (controller === 'js' || controller === 'css' || controller === 'html' || controller === 'img') {
+        res.status(404);
+        res.send();
+        return;
+    }
 
     controller = controller || 'home';
     action = action || 'index';
 
-    var ctr = controllers[controller]
+    var ctr = controllers[controller];
 
     try {
         if (!ctr) {
             ctr = controllers[controller] = require('./routes/' + controller);
         }
+
+        res.locals.douban_user_id = res.locals.douban_user_id || settings.douban_user_id;
+        res.locals.douban_user_name = res.locals.douban_user_name || settings.douban_user_name;
 
         if (ctr[action]) {
             if (ispost && ctr[action].post) {
@@ -57,6 +65,7 @@ function urlRouter(req, res, controller, action, id, ispost) {
             res.render('error', {error: 'page not found'});
         }
     } catch (err) {
+        console.error('404 @ ', req.url);
         console.error(err.stack);
         res.status(404);
         res.render('error', {error: err.stack});
@@ -77,16 +86,20 @@ app.post('/:controller/:action?/:id?', function (req, res) {
 
 
 exports.start = start = function () {
+
+    console.log('server start');
+
     var server = require('http').createServer(app);
 
     var port = settings.serverPort;
     server.listen(port);
 
-    require('./models/doubanMovie').init();
-    require('./models/doubanUser').init();
-    require('./models/dbPool').init(settings.dbUrl, 3);
+    process.on('uncaughtException', function (err) {
+        console.error('app error', err.stack);
+    });
 };
 
 if (!module.parent) {
     start()
 }
+

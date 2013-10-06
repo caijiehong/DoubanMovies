@@ -1,58 +1,67 @@
 !!! transitional
 html
     head
-        title 欢迎来到我的豆瓣电影
-        link(rel='stylesheet', href='/css/bootstrap.css')
-        link(rel='stylesheet', href='/css/dou.css')
-        link(href='/css/bootstrap-responsive.css', rel='stylesheet')
-        script(src='/js/jquery-2.0.2.min.js')
-        script(src='/js/bootstrap.js')
-        script(src='https://www.google.com/jsapi')
-        script(src='/js/index.js')
+        title 那些年我们看过的豆瓣·电影
+        link(rel='stylesheet', type="text/css", href='/css/dou.css')
+        link(rel='stylesheet', type="text/css", href='/css/douban/packed_douban187002845.css')
+        link(rel='stylesheet', type="text/css", href='/css/douban/packed__all8283606675.css')
+        link(rel='stylesheet', type="text/css", href='/css/douban/25d3b5506d8241e.css')
+        script(src='/lib/require.js', data-main='/js/home')
+
     body
-        .navbar.navbar-fixed-top
-            .navbar-inner
-                .container
-                    a.brand(href='/') 欢迎来到我的豆瓣电影
-                    .nav-collapse.collapse.navbar-responsive-collapse.pull-right
-                        form.navbar-form(action='#')
-                            span 输入豆瓣ID&nbsp
-                            input#txtUser(type='text', value='staybird', style='width:90px')
-                            | &nbsp
-                            button#btnUser.btn.btn-primary 看看
-        #container.container
-            .row
-                .span2
-                    ul.nav.nav-list
-                        li.nav-header Top 25
-                        - topList.forEach(function(item){
-                        -   str = item.userName || item.userId
-                        -   if(!/\w+/.test(str)){
-                        -       str = str.substring(0,7)
-                        -   }
+        #db-nav-sns.nav
+            .nav-wrap
+                .nav-primary
+                    .nav-search
+                        form#formNav
+                            fieldset
+                                .inp
+                                    input#inp-query(type="text", name="q",size="22",title="搜索搜索你感兴趣的内容和人...", placeholder="请输入你的豆瓣ID", maxlength="60")
+                                .inp-btn
+                                    input(type="submit", value="搜索")
+                    .nav-items
+                        ul
                             li
-                                a(href='/home/user/#{item.userId}')
-                                            span #{str}
-                                            span.pull-right #{item.totalWatch}
+                                a(href="/") 那些年我们看过的豆瓣·电影
+        #wrapper(style="width:1024px")
+            #content
+                .grid-16-8.clearfix
+                    .article(style="width:800px")
+                        div
+                            span#spnSum(style='width:600px;padding-left:10px')
+                            button#btnUpdate 刷新数据
+                        #divLoading.progress.progress-striped.active(style='width:300px;margin:0 auto')
+                            .bar(style='width:100%;')
+                        div
+                            #chart_rate(style='width:380px;height:350px;float:left')
+                            #chart_genre(style='width:380px;height:350px;margin-left:300px')
 
-                        - })
-                .span10
-                    div
-                        button#btnUpdate.btn.btn-primary(style='display:none') 刷新数据
-                        span#spnSum(style='width:600px;padding-left:10px')
-                        a.pull-right(href='https://github.com/caijiehong/DoubanMovies') @caijiehong
-                    #divLoading.progress.progress-striped.active(style='width:300px;margin:0 auto')
-                        .bar(style='width:100%;')
-                    div
-                        #chart_rate(style='width:400px;height:400px;float:left')
-                        #chart_genre(style='width:400px;height:400px;margin-left:450px')
-                    div
-                        #chart_director(style='width:400px;height:800px;float:left')
-                        #chart_cast(style='width:400px;height:800px;margin-left:450px')
-                    #chart_country
-                    #chart_year
-                    #chart_watchTime
+                        div
+                            #chart_director(style='width:370px;height:800px;float:left')
+                            #chart_cast(style='width:370px;height:800px;margin-left:370px')
 
+                    .aside(style="width:180px")
+                        .movie_top
+                            ul.content
+                                li.clearfix
+                                    span.box_chart_num.color-gray Top 25
+                                - topList.forEach(function(item){
+                                -   str = item.userName || item.userId
+                                -   if(!/\w+/.test(str)){
+                                -       str = str.substring(0,7)
+                                -   }
+                                li.clearfix
+                                    .box_chart(style="width:140px")
+                                        a(href='/home/user/#{item.userId}') #{str}
+                                    span.box_chart_num.color-gray #{item.totalWatch}
+                                - })
+                                li.clearfix
+                                    span.box_chart_num.color-gray
+                                        a(href="https://github.com/caijiehong/DoubanMovies") @caijiehong
+
+                #chart_country
+                #chart_year
+                #chart_watchTime
 
         input#douban_user_name(type='hidden', value='#{douban_user_name}')
         input#douban_user_id(type='hidden', value='#{douban_user_id}')

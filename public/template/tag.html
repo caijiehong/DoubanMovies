@@ -1,0 +1,35 @@
+<script type="text/template" id="tplTag">
+    <div class="movie-tags-cloud">
+        <div class="tag-fav-cloud clearfix">
+            <% for(var i=0;i<tags.length;i++){var item = tags[i]; %>
+            <a href="#" title="<%=item.count%>部电影" class="j a_switch_tab_movie c0 <%=item.selected?'current':''%>" data-id="<%=item.id%>"><%=item.name%></a>
+            <%}%>
+        </div>
+        <div class="rec-list clearfix" id="divMovies" style="min-height: 352px;">
+                <%include('tplMovie', {movies: movies})%>
+        </div>
+    </div>
+</script>
+<script type="text/template" id="tplMovie">
+    <ul class="list-col5 clearfix">
+        <% for(var i=0;i<movies.length;i++){var item = movies[i]; %>
+        <div class="item">
+            <div class="pic">
+                <a target="_blank" href="http://movie.douban.com/subject/<%=item.id%>/" class="cover-a">
+                    <img src="http://bcs.duapp.com<%=item.baidu%>" class="cover" style="width:69px;height:96px">
+                </a>
+            </div>
+            <div class="info">
+                <ul>
+                    <li class="title"><a target="_blank" href="http://movie.douban.com/subject/<%=item.id%>/"><%=item.title%></a></li>
+                    <li><span class="star star<%=item.rating.stars%>"></span> <em><%=item.rating.average%></em></li>
+                    <li style="width: 185px;white-space:nowrap" title="导演: <%=item.directors%>">导演: <%=item.directors%></li>
+                    <li style="width: 185px;white-space:nowrap" title="主演: <%=item.casts%>">主演: <%=item.casts%></li>
+                    <li style="width: 185px;white-space:nowrap"><%=item.year%></li>
+                </ul>
+            </div>
+        </div>
+        <%}%>
+    </ul>
+</script>
+

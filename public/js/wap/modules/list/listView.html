@@ -1,0 +1,14 @@
+<a href="http://movie.douban.com/subject/<%= id%>/" target="_blank">
+<img src="http://bcs.duapp.com<%= baidu%>" style="height: 108px;max-height: 108px;width: 85px;max-width: 85px"/>
+<h1>
+    <%= title%>
+
+</h1>
+    <p>
+        <span class="star star<%= rating.stars%>"> </span>
+        <%= rating.average + ' (' + year +') '%>
+    </p>
+
+<p><%= directors|| '&nbsp' %></p>
+    <p><%= casts|| '&nbsp'%></p>
+</a>

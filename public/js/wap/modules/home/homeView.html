@@ -1,0 +1,29 @@
+<div id="divDesc" class="listTag">
+    <p>总共看了 <%= totalWatch %> 部电影</p>
+
+    <p>总时长 <%=totalDuration %> 分钟</p>
+
+    <p>平均打分 <span class="<%=star%> star35"></span> <%= avR %></p></div>
+
+<% if(tag == 'rate') {%>
+<ul data-role="listview" data-inset="true">
+    <li data-role="list-divider">打分</li>
+    <li><a href="#list/rate/5/5星/<%=rate[0][1]%>"><span class="star star50"></span><span class="ui-li-count"><%=rate[0][1]%></span></a></li>
+    <li><a href="#list/rate/4/4星/<%=rate[1][1]%>"><span class="star star40"></span><span class="ui-li-count"><%=rate[1][1]%></span></a></li>
+    <li><a href="#list/rate/3/3星/<%=rate[2][1]%>"><span class="star star30"></span><span class="ui-li-count"><%=rate[2][1]%></span></a></li>
+    <li><a href="#list/rate/2/2星/<%=rate[3][1]%>"><span class="star star20"></span><span class="ui-li-count"><%=rate[3][1]%></span></a></li>
+    <li><a href="#list/rate/1/1星/<%=rate[4][1]%>"><span class="star star10"></span><span class="ui-li-count"><%=rate[4][1]%></span></a></li>
+</ul>
+<% } else { %>
+<ul data-role="listview" data-inset="true">
+    <li data-role="list-divider"><%= tagName %></li>
+    <% _.each(list, function(item) {%>
+    <li>
+        <a href="#list/<%= tag %>/<%= item[2]||item[0] %>/<%= item[0]%>/<%= item[1] %>">
+            <%= item[0] %>
+            <span class="ui-li-count"><%= item[1] %></span>
+        </a>
+    </li>
+    <% }); %>
+</ul>
+<% } %>
